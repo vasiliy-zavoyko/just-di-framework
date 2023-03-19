@@ -6,22 +6,36 @@ import lombok.SneakyThrows;
 import ru.zavoyko.framework.di.config.Config;
 import ru.zavoyko.framework.di.config.JavaConfig;
 
+import java.util.Map;
+
 /**
  * The factory for the components.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+
 public class ComponentFactory {
 
-    private static final ComponentFactory COMPONENT_FACTORY = new ComponentFactory();
-    private static final Config CONFIG = new JavaConfig("ru.zavoyko.framework");
+    private static final String SYNC_LOCK = "syncLock";
+    private static ComponentFactory COMPONENT_FACTORY = new ComponentFactory();
+    private static Config CONFIG;
+
 
     /**
      * Gets the instance of the factory.
      *
      * @return The instance of the factory.
      */
-    public static ComponentFactory getInstance() {
+    public static ComponentFactory getInstance(Map<Class, Class> interfaceToImplClassMap) {
+        var ref = CONFIG;
+        if (ref == null) {
+            synchronized (SYNC_LOCK) {
+                ref = CONFIG;
+                if (ref == null) {
+                    CONFIG = new JavaConfig("ru.zavoyko.framework.di.dataset", interfaceToImplClassMap);
+                }
+            }
+        }
         return COMPONENT_FACTORY;
+
     }
 
     /**

@@ -3,7 +3,7 @@ package ru.zavoyko.framework.di.config;
 import org.reflections.Reflections;
 import ru.zavoyko.framework.di.exceptions.JavaConfigException;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * The Java configuration for the DI container.
@@ -11,14 +11,16 @@ import java.util.Set;
 public class JavaConfig implements Config {
 
     private final Reflections scanner;
+    private final Map<Class, Class> interfaceToImplClassMap;
 
     /**
      * The constructor.
      *
      * @param packageToScan The package to scan for the components.
      */
-    public JavaConfig(String packageToScan) {
+    public JavaConfig(String packageToScan, Map<Class, Class> interfaceToImplClassMap) {
         scanner = new Reflections(packageToScan);
+        this.interfaceToImplClassMap = interfaceToImplClassMap;
     }
 
     /**
@@ -30,11 +32,13 @@ public class JavaConfig implements Config {
      */
     @Override
     public <T> Class<? extends T> getImplClass(Class<T> componentClassInterface) {
-        Set<Class<? extends T>> classes = scanner.getSubTypesOf(componentClassInterface);
-        if (classes.size() != 1) {
-            throw new JavaConfigException("0 or more than 1 impl found for " + componentClassInterface);
-        }
-        return classes.iterator().next();
+        return interfaceToImplClassMap.computeIfAbsent(componentClassInterface , clazz -> {
+            Set<Class<? extends T>> classes = scanner.getSubTypesOf(componentClassInterface);
+            if (classes.size() != 1) {
+                throw new JavaConfigException("0 or more than 1 impl found for " + componentClassInterface);
+            }
+            return classes.iterator().next();
+        });
     }
 
 }
