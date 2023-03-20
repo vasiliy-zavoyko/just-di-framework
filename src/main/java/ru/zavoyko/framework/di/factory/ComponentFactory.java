@@ -1,12 +1,17 @@
 package ru.zavoyko.framework.di.factory;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import ru.zavoyko.framework.di.config.Config;
-import ru.zavoyko.framework.di.config.JavaConfig;
+import ru.zavoyko.framework.di.config.java.JavaConfig;
+import ru.zavoyko.framework.di.inject.InjectProperty;
+import ru.zavoyko.framework.di.properties.PropertiesLoader;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import static com.google.common.io.Resources.getResource;
 
 /**
  * The factory for the components.
@@ -18,6 +23,11 @@ public class ComponentFactory {
     private static ComponentFactory COMPONENT_FACTORY = new ComponentFactory();
     private static Config CONFIG;
 
+    private static Map<String, String> PROPERTIES;
+
+    private ComponentFactory() {
+        PROPERTIES = new PropertiesLoader().loadProperties("application.properties");
+    }
 
     /**
      * Gets the instance of the factory.
@@ -25,17 +35,16 @@ public class ComponentFactory {
      * @return The instance of the factory.
      */
     public static ComponentFactory getInstance(Map<Class, Class> interfaceToImplClassMap) {
-        var ref = CONFIG;
-        if (ref == null) {
+        var refConfig = CONFIG;
+        if (refConfig == null) {
             synchronized (SYNC_LOCK) {
-                ref = CONFIG;
-                if (ref == null) {
+                refConfig = CONFIG;
+                if (refConfig == null) {
                     CONFIG = new JavaConfig("ru.zavoyko.framework.di.dataset", interfaceToImplClassMap);
                 }
             }
         }
         return COMPONENT_FACTORY;
-
     }
 
     /**
@@ -51,7 +60,21 @@ public class ComponentFactory {
         if (componentClass.isInterface()) {
             implClass = CONFIG.getImplClass(componentClass);
         }
-        return implClass.getDeclaredConstructor().newInstance();
+        final var newInstance = implClass.getDeclaredConstructor().newInstance();
+        for (Field field : getFields(implClass)) {
+            if (field.isAnnotationPresent(InjectProperty.class)) {
+                final var annotation = field.getAnnotation(InjectProperty.class);
+                final var value = (annotation.value().isEmpty()) ?
+                        PROPERTIES.get(field.getName()) : PROPERTIES.get(annotation.value());
+                field.setAccessible(true);
+                field.set(newInstance, value);
+            }
+        }
+        return newInstance;
+    }
+
+    private ArrayList<Field> getFields(Class<?> clazz) {
+        return new ArrayList<>(List.of(clazz.getDeclaredFields()));
     }
 
 }

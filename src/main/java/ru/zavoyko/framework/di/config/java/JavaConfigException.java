@@ -1,4 +1,6 @@
-package ru.zavoyko.framework.di.exceptions;
+package ru.zavoyko.framework.di.config.java;
+
+import ru.zavoyko.framework.di.exceptions.DIContainerException;
 
 /**
  * The exception for the Java configuration.

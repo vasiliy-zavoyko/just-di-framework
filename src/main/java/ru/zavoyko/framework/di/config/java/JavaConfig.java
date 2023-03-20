@@ -1,7 +1,7 @@
-package ru.zavoyko.framework.di.config;
+package ru.zavoyko.framework.di.config.java;
 
 import org.reflections.Reflections;
-import ru.zavoyko.framework.di.exceptions.JavaConfigException;
+import ru.zavoyko.framework.di.config.Config;
 
 import java.util.*;
 
