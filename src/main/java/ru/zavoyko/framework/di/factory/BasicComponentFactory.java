@@ -20,8 +20,16 @@ public class BasicComponentFactory implements ComponentFactory {
     @Override
     @SneakyThrows
     public <T> T createComponent(Class<T> componentClass) {
-        Class<? extends T> implClass = componentClass;
-        Definition deferredDefinition;
+        Definition deferredDefinition = getDefinitionByClass(componentClass);
+        var newInstance = getInstanceByDefinition(deferredDefinition);
+        setDependencies(newInstance);
+        if (componentClass.isInstance(newInstance)) {
+            return (T) newInstance ;
+        }
+        throw new ComponentBindException("No implementation found for " + componentClass.getCanonicalName());
+    }
+
+    public <T> Definition getDefinitionByClass(Class<T> componentClass) {
         if (componentClass.isInterface()) {
             final var definitions = context.getComponentsDefinitions().stream()
                     .filter(definition -> definition.getComponentAliases().contains(componentClass.getCanonicalName()))
@@ -29,19 +37,12 @@ public class BasicComponentFactory implements ComponentFactory {
             if (definitions.size() > 1) {
                 throw new ComponentBindException("More than one implementation found for " + componentClass.getCanonicalName());
             }
-            deferredDefinition = definitions.stream().findFirst()
+            return definitions.stream().findFirst()
                     .orElseThrow(() -> new ComponentBindException("No implementation found for " + componentClass.getCanonicalName()));
         } else {
-
-            deferredDefinition = context.getDefinitionByAliasName(componentClass.getCanonicalName())
+            return context.getDefinitionByAliasName(componentClass.getCanonicalName())
                     .orElseThrow(() -> new ComponentBindException("No definition found for type: " + componentClass.getCanonicalName()));
         }
-
-        final var newInstance = (T) getInstanceByDefenition(deferredDefinition);
-
-        setDependencies(newInstance);
-
-        return newInstance;
     }
 
     public void setDependencies(Object instance) {
@@ -49,7 +50,7 @@ public class BasicComponentFactory implements ComponentFactory {
     }
 
     @SneakyThrows
-    public Object getInstanceByDefenition(Definition defenition) {
+    public Object getInstanceByDefinition(  Definition defenition) {
         return defenition.getType().getDeclaredConstructor().newInstance();
     }
 
