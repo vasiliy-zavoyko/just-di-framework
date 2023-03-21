@@ -1,13 +1,15 @@
-package ru.zavoyko.framework.di.processors;
+package ru.zavoyko.framework.di.processors.impl;
 
 import lombok.SneakyThrows;
+import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.inject.InjectProperty;
+import ru.zavoyko.framework.di.processors.impl.java.JavaComponentProcessor;
 import ru.zavoyko.framework.di.properties.PropertiesLoader;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class InjectPropertyComponentProcessorImpl extends AbstractComponentProcessor implements ComponentProcessor {
+public class InjectPropertyComponentProcessorImpl extends JavaComponentProcessor {
 
     private Map<String, String> properties;
 
@@ -18,7 +20,7 @@ public class InjectPropertyComponentProcessorImpl extends AbstractComponentProce
 
     @Override
     @SneakyThrows
-    public void process(Object component) {
+    public void process(BasicContext context, Object component) {
         final var implClass = component.getClass();
         for (Field field : getFields(implClass)) {
             if (field.isAnnotationPresent(InjectProperty.class)) {
@@ -30,5 +32,6 @@ public class InjectPropertyComponentProcessorImpl extends AbstractComponentProce
             }
         }
     }
+
 
 }

@@ -1,11 +1,11 @@
 package ru.zavoyko.framework.di.source.java.exceptions;
 
-import ru.zavoyko.framework.di.exceptions.DIContainerException;
+import ru.zavoyko.framework.di.exceptions.DIFrameworkException;
 
 /**
  * The exception for the Java configuration.
  */
-public abstract class JavaObjectSourceException extends DIContainerException {
+public abstract class JavaObjectSourceException extends DIFrameworkException {
 
     protected JavaObjectSourceException(String message) {
         super(message);

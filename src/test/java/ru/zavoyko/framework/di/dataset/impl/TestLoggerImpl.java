@@ -1,13 +1,15 @@
 package ru.zavoyko.framework.di.dataset.impl;
 
-import ru.zavoyko.framework.di.MainTest;
 import ru.zavoyko.framework.di.dataset.Logger;
 import ru.zavoyko.framework.di.dataset.Validator;
-import ru.zavoyko.framework.di.factory.ComponentFactory;
+import ru.zavoyko.framework.di.inject.InjectByType;
+import ru.zavoyko.framework.di.inject.java.TypeToInject;
 
+@TypeToInject(isLazy = false, isSingleton = true)
 public class TestLoggerImpl implements Logger {
 
-    private final Validator validator = ComponentFactory.getInstance(MainTest.factoryMap).createComponent(Validator.class);
+    @InjectByType
+    private Validator validator;
 
     @Override
     public void log(String message) {

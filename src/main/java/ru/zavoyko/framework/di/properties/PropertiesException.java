@@ -1,11 +1,11 @@
 package ru.zavoyko.framework.di.properties;
 
-import ru.zavoyko.framework.di.exceptions.DIContainerException;
+import ru.zavoyko.framework.di.exceptions.DIFrameworkException;
 
 /**
  * The exception for the properties.
  */
-public class PropertiesException extends DIContainerException {
+public class PropertiesException extends DIFrameworkException {
 
     public PropertiesException(String message) {
         super(message);
