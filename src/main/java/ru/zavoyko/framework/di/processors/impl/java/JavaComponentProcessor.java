@@ -1,7 +1,6 @@
 package ru.zavoyko.framework.di.processors.impl.java;
 
-import org.reflections.Reflections;
-import ru.zavoyko.framework.di.processors.AbstractComponentProcessor;
+import ru.zavoyko.framework.di.processors.impl.AbstractComponentProcessor;
 
 import java.lang.reflect.Field;
 

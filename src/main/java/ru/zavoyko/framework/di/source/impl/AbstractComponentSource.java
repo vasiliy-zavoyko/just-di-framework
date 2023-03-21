@@ -1,7 +1,9 @@
-package ru.zavoyko.framework.di.source;
+package ru.zavoyko.framework.di.source.impl;
 
 import ru.zavoyko.framework.di.inject.java.TypeToInject;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
+import ru.zavoyko.framework.di.source.ComponentSource;
+import ru.zavoyko.framework.di.source.Definition;
 
 import java.util.*;
 

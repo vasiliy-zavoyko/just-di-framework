@@ -7,7 +7,7 @@ import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.factory.BasicComponentFactory;
 import ru.zavoyko.framework.di.source.Definition;
 import ru.zavoyko.framework.di.source.ComponentSource;
-import ru.zavoyko.framework.di.source.java.JavaObjectComponentSource;
+import ru.zavoyko.framework.di.source.impl.java.JavaObjectComponentSource;
 
 import java.util.*;
 

@@ -4,7 +4,7 @@ import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.exceptions.ComponentBindException;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.Definition;
-import ru.zavoyko.framework.di.source.java.exceptions.JavaObjectSourceProcessorException;
+import ru.zavoyko.framework.di.source.impl.java.exceptions.JavaObjectSourceProcessorException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;

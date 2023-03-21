@@ -1,8 +1,9 @@
-package ru.zavoyko.framework.di.source;
+package ru.zavoyko.framework.di.source.impl;
 
 import com.google.common.base.Objects;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import ru.zavoyko.framework.di.source.Definition;
 
 import java.util.List;
 

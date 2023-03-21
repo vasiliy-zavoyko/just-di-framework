@@ -1,4 +1,4 @@
-package ru.zavoyko.framework.di.source.java.exceptions;
+package ru.zavoyko.framework.di.source.impl.java.exceptions;
 
 public class JavaObjectSourceInstanceCreationException extends JavaObjectSourceException {
 

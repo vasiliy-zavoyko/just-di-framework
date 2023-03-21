@@ -1,4 +1,4 @@
-package ru.zavoyko.framework.di.processors;
+package ru.zavoyko.framework.di.processors.impl;
 
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 
