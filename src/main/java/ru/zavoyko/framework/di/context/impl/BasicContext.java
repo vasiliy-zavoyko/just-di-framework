@@ -3,7 +3,7 @@ package ru.zavoyko.framework.di.context.impl;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.zavoyko.framework.di.factory.BasicComponentFactory;
+import ru.zavoyko.framework.di.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.factory.ComponentFactory;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.Definition;
@@ -23,7 +23,9 @@ public class BasicContext extends AbstractContext {
     @Getter
     private final Map<String, Definition> definitions;
     @Getter
-    private Set<ComponentProcessor> processors;
+    private Set<ComponentProcessor> componentProcessors;
+    @Getter
+    private Set<ActionsProcessor> actionsProcessors;
     @Getter
     private Set<Definition> componentsDefinitions;
 
@@ -40,15 +42,29 @@ public class BasicContext extends AbstractContext {
     @Override
     public void initContext() {
         logger.warn("Initializing context");
+        logger.warn("Preparing component processors");
         final var componentProcessors = new HashSet<ComponentProcessor>();
         definitions.values().stream()
                 .filter(item -> !item.isComponent())
                 .map(Definition::getType)
-                .map(this::createProcessor)
+                .filter(item -> ComponentProcessor.class.isAssignableFrom(item))
+                .map(this::createComponentProcessor)
                 .forEach(componentProcessors::add);
-        this.processors = unmodifiableSet(componentProcessors);
-        logger.warn("Processors: {}", processors);
+        this.componentProcessors = unmodifiableSet(componentProcessors);
+        logger.warn("Component processors: {}", componentProcessors);
 
+        logger.warn("Preparing actions processors");
+        final var actionsProcessors = new HashSet<ActionsProcessor>();
+        definitions.values().stream()
+                .filter(item -> !item.isComponent())
+                .map(Definition::getType)
+                .filter(item -> ActionsProcessor.class.isAssignableFrom(item))
+                .map(this::createActionProcessor)
+                .forEach(actionsProcessors::add);
+        this.actionsProcessors = unmodifiableSet(actionsProcessors);
+        logger.warn("Actions processors: {}", actionsProcessors);
+
+        logger.warn("Preparing components");
         final var componentDefinitions = new HashSet<Definition>();
         definitions.values().stream()
                 .filter(Definition::isComponent)
@@ -56,6 +72,7 @@ public class BasicContext extends AbstractContext {
         this.componentsDefinitions = unmodifiableSet(componentDefinitions);
         logger.warn("Components: {}", componentsDefinitions);
 
+        logger.warn("Preparing singletons");
         componentsDefinitions.stream()
                 .filter(Definition::isSingleton)
                 .filter(definition -> !definition.isLazy())
@@ -86,7 +103,7 @@ public class BasicContext extends AbstractContext {
                 return (T) singltonsMap.get(instance);
             } else {
                 final var component = factory.createComponent(instance);
-                singltonsMap.put(component.getClass(), component);
+                singltonsMap.put(definition.getType(), component);
                 return component;
             }
         }
@@ -102,4 +119,5 @@ public class BasicContext extends AbstractContext {
     protected Set<Definition> componentsDefinitions() {
         return componentsDefinitions;
     }
+
 }

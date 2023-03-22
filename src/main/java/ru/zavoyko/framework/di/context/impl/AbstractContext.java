@@ -1,5 +1,6 @@
 package ru.zavoyko.framework.di.context.impl;
 
+import ru.zavoyko.framework.di.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.exceptions.ComponentBindException;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
@@ -37,7 +38,16 @@ public abstract class AbstractContext implements Context {
                 .orElseThrow( () -> new ComponentBindException("No definition found for type: " + type.getCanonicalName()));
     }
 
-    protected ComponentProcessor createProcessor(Class<? extends ComponentProcessor> processor) {
+    protected ComponentProcessor createComponentProcessor(Class<? extends ComponentProcessor> processor) {
+        try {
+            return processor.getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
+            throw new JavaObjectSourceProcessorException("Failed to create processor " + processor, e);
+        }
+    }
+
+    protected ActionsProcessor createActionProcessor(Class<? extends ActionsProcessor> processor) {
         try {
             return processor.getDeclaredConstructor().newInstance();
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException |

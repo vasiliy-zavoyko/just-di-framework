@@ -10,7 +10,7 @@ import ru.zavoyko.framework.di.inject.java.TypeToInject;
 @TypeToInject(isLazy = false, isSingleton = true)
 public class TestPrinterImpl implements Printer {
 
-    Logger logger = LogManager.getLogger(TestPrinterImpl.class);
+    private final static Logger logger = LogManager.getLogger(TestPrinterImpl.class);
 
     public TestPrinterImpl() {
         logger.debug("Test printer is created");

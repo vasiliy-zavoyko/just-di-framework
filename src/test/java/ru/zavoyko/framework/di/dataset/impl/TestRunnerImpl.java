@@ -11,7 +11,7 @@ import ru.zavoyko.framework.di.inject.java.TypeToInject;
 @TypeToInject
 public class TestRunnerImpl implements Runner {
 
-    Logger logger = LoggerFactory.getLogger(TestRunnerImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(TestRunnerImpl.class);
     public TestRunnerImpl() {
         logger.debug("Test runner is created");
     }

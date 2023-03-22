@@ -1,5 +1,6 @@
 package ru.zavoyko.framework.di.source.impl;
 
+import ru.zavoyko.framework.di.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.inject.java.TypeToInject;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.ComponentSource;
@@ -12,7 +13,7 @@ public abstract class AbstractComponentSource implements ComponentSource {
     protected abstract String getPackageToScan();
 
     @Override
-    public Set<Definition> getComponentDefinitions() {
+    public Set<Definition> getDefinitions() {
         final var definitions = new HashSet<Definition>();
 
         final var setOfTypes = getTypeToInjectClasses();
@@ -29,12 +30,19 @@ public abstract class AbstractComponentSource implements ComponentSource {
             definitions.add(componentDefinition);
         }
 
+        for (var item : getActionsProcessorClasses()) {
+            final var componentDefinition = getComponentDefinition(item);
+            definitions.add(componentDefinition);
+        }
+
         return definitions;
     }
 
     protected abstract Set<Class<?>> getTypeToInjectClasses();
 
     protected abstract Set<Class<? extends ComponentProcessor>> getComponentProcessorClasses();
+
+    protected abstract Set<Class<? extends ActionsProcessor>> getActionsProcessorClasses();
 
     protected Definition getComponentDefinition(Class<?> clazz) {
         if (clazz.isAnnotationPresent(TypeToInject.class)) {

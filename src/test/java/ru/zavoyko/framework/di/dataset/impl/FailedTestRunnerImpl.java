@@ -8,7 +8,7 @@ import ru.zavoyko.framework.di.inject.java.TypeToInject;
 @TypeToInject
 public class FailedTestRunnerImpl implements Runner {
 
-    Logger logger = LoggerFactory.getLogger(FailedTestRunnerImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(FailedTestRunnerImpl.class);
 
     public FailedTestRunnerImpl() {
         logger.debug("Failed test runner is created");

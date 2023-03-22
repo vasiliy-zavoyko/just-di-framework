@@ -1,14 +1,14 @@
 package ru.zavoyko.framework.di.factory;
 
 import lombok.SneakyThrows;
-import org.reflections.Reflections;
+import ru.zavoyko.framework.di.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.exceptions.ComponentBindException;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.Definition;
 
-import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BasicComponentFactory implements ComponentFactory {
 
@@ -24,7 +24,8 @@ public class BasicComponentFactory implements ComponentFactory {
     public <T> T createComponent(Class<T> componentClass) {
         Definition deferredDefinition = getDefinitionByClass(componentClass);
         var newInstance = getInstanceByDefinition(deferredDefinition);
-        setDependencies(newInstance);
+        newInstance = setDependencies(newInstance);
+        newInstance = setActions(newInstance);
         if (componentClass.isInstance(newInstance)) {
             return (T) newInstance ;
         }
@@ -35,7 +36,7 @@ public class BasicComponentFactory implements ComponentFactory {
         if (componentClass.isInterface()) {
             final var definitions = context.getComponentsDefinitions().stream()
                     .filter(definition -> definition.getComponentAliases().contains(componentClass.getCanonicalName()))
-                    .toList();
+                    .collect(Collectors.toList());
             if (definitions.size() > 1) {
                 throw new ComponentBindException("More than one implementation found for " + componentClass.getCanonicalName());
             }
@@ -47,8 +48,20 @@ public class BasicComponentFactory implements ComponentFactory {
         }
     }
 
-    public void setDependencies(Object instance) {
-        componentProcessors().forEach(processor -> processor.process(context, instance));
+    public Object setDependencies(Object instance) {
+        Object newInstance = instance;
+        for (ComponentProcessor processor : componentProcessors()) {
+            newInstance = processor.process(context, newInstance);
+        }
+        return newInstance;
+    }
+
+    private Object setActions(Object newInstance) {
+        Object instance = newInstance;
+        for (ActionsProcessor processor : actionProcessors()) {
+            instance = processor.applyAction(context, instance);
+        }
+        return instance;
     }
 
     @SneakyThrows
@@ -57,7 +70,11 @@ public class BasicComponentFactory implements ComponentFactory {
     }
 
     public Set<ComponentProcessor> componentProcessors() {
-        return context.getProcessors();
+        return context.getComponentProcessors();
+    }
+
+    public Set<ActionsProcessor> actionProcessors() {
+        return context.getActionsProcessors();
     }
 
 }

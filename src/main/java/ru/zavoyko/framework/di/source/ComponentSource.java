@@ -5,6 +5,6 @@ import java.util.Set;
 
 public interface ComponentSource {
 
-    Set<Definition> getComponentDefinitions();
+    Set<Definition> getDefinitions();
 
 }

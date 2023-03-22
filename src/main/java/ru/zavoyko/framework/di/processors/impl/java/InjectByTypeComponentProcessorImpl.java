@@ -6,7 +6,7 @@ import ru.zavoyko.framework.di.inject.InjectByType;
 public class InjectByTypeComponentProcessorImpl extends JavaComponentProcessor {
 
     @Override
-    public void process(BasicContext context, Object component) {
+    public Object process(BasicContext context, Object component) {
         for (var field : component.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(InjectByType.class)) {
                 var fieldClass = field.getType();
@@ -15,6 +15,7 @@ public class InjectByTypeComponentProcessorImpl extends JavaComponentProcessor {
                 setField(component, field, instance);
             }
         }
+        return component;
     }
 
 }

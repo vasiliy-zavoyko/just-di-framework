@@ -20,7 +20,7 @@ public class InjectPropertyComponentProcessorImpl extends JavaComponentProcessor
 
     @Override
     @SneakyThrows
-    public void process(BasicContext context, Object component) {
+    public Object process(BasicContext context, Object component) {
         final var implClass = component.getClass();
         for (Field field : getFields(implClass)) {
             if (field.isAnnotationPresent(InjectProperty.class)) {
@@ -31,6 +31,7 @@ public class InjectPropertyComponentProcessorImpl extends JavaComponentProcessor
                 field.set(component, value);
             }
         }
+        return component;
     }
 
 

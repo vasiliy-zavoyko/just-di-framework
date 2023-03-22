@@ -9,7 +9,7 @@ import ru.zavoyko.framework.di.inject.java.TypeToInject;
 @TypeToInject
 public class ValidatorImpl implements Validator {
 
-    Logger logger = LoggerFactory.getLogger(ValidatorImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(ValidatorImpl.class);
 
     public ValidatorImpl() {
         logger.debug("Validator is created");

@@ -18,7 +18,7 @@ public class DIFramework {
         final var componentDefinitionHashMap = new HashMap<String, Definition>();
         componentSources
                 .stream()
-                .map(ComponentSource::getComponentDefinitions)
+                .map(ComponentSource::getDefinitions)
                 .flatMap(Set::stream)
                 .forEach(item -> componentDefinitionHashMap.put(item.getComponentClassName(), item));
         final var basicContext = new BasicContext(componentDefinitionHashMap);

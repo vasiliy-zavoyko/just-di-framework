@@ -1,5 +1,6 @@
 package ru.zavoyko.framework.di.source.impl;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -73,4 +74,17 @@ public class BasicDefinition implements Definition {
         return Objects.hashCode(getComponentName());
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("componentName", componentName)
+//                .add("componentClassName", componentClassName)
+//                .add("componentSourceName", componentSourceName)
+//                .add("componentAliases", componentAliases)
+                .add("isSingleton", isSingleton)
+//                .add("isLazy", isLazy)
+                .add("isComponent", isComponent)
+//                .add("type", type)
+                .toString();
+    }
 }
