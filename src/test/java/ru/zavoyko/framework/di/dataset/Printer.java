@@ -1,6 +1,6 @@
 package ru.zavoyko.framework.di.dataset;
 
-public interface Logger {
+public interface Printer {
 
     void log(String message);
 

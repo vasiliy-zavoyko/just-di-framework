@@ -1,11 +1,13 @@
 package ru.zavoyko.framework.di.factory;
 
 import lombok.SneakyThrows;
+import org.reflections.Reflections;
 import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.exceptions.ComponentBindException;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.Definition;
 
+import java.util.Scanner;
 import java.util.Set;
 
 public class BasicComponentFactory implements ComponentFactory {
@@ -50,8 +52,8 @@ public class BasicComponentFactory implements ComponentFactory {
     }
 
     @SneakyThrows
-    public Object getInstanceByDefinition(  Definition defenition) {
-        return defenition.getType().getDeclaredConstructor().newInstance();
+    public Object getInstanceByDefinition(Definition definition) {
+        return definition.getType().getDeclaredConstructor().newInstance();
     }
 
     public Set<ComponentProcessor> componentProcessors() {

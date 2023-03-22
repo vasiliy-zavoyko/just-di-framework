@@ -1,19 +1,27 @@
 package ru.zavoyko.framework.di.dataset.impl;
 
-import ru.zavoyko.framework.di.dataset.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.zavoyko.framework.di.dataset.Printer;
 import ru.zavoyko.framework.di.dataset.Validator;
 import ru.zavoyko.framework.di.inject.InjectByType;
 import ru.zavoyko.framework.di.inject.java.TypeToInject;
 
 @TypeToInject(isLazy = false, isSingleton = true)
-public class TestLoggerImpl implements Logger {
+public class TestPrinterImpl implements Printer {
+
+    Logger logger = LogManager.getLogger(TestPrinterImpl.class);
+
+    public TestPrinterImpl() {
+        logger.debug("Test printer is created");
+    }
 
     @InjectByType
     private Validator validator;
 
     @Override
     public void log(String message) {
-        System.out.println("Test logger: " + message);
+        logger.info("Test logger: " + message);
         validator.validate();
     }
 

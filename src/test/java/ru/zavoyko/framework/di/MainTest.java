@@ -1,23 +1,24 @@
 package ru.zavoyko.framework.di;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.zavoyko.framework.di.dataset.*;
-import ru.zavoyko.framework.di.dataset.impl.TestRunnerImpl;
 
 public class MainTest {
+
+    Logger logger = LoggerFactory.getLogger(MainTest.class);
 
     @org.junit.jupiter.api.Test
     void testRun() {
         final var components = DIFramework.createForJavaComponents("ru.zavoyko.framework.di");
-        final var logger = components.getComponent(Logger.class);
-        final var runner = components.getComponent(TestRunnerImpl.class);
-        logger.log("test logger");
+        final var starter = components.getComponent(Starter.class);
         testOutput();
-        runner.run();
+        starter.start();
     }
 
 
     private void testOutput() {
-        System.out.println("Hello world!");
+        logger.info("Hello world!");
     }
 
 }
