@@ -24,7 +24,10 @@ public class JavaObjectComponentSource extends AbstractComponentSource {
     @Override
     protected Set<Class<?>> getTypeToInjectClasses() {
         final var scanner = new Reflections(packageToScan);
-        return scanner.getTypesAnnotatedWith(TypeToInject.class, true);
+        return scanner.getTypesAnnotatedWith(TypeToInject.class, true).stream()
+                .filter(clazz -> !clazz.isInterface())
+                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .collect(Collectors.toSet());
     }
 
     @Override

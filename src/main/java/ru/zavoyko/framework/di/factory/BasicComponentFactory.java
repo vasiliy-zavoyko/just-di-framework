@@ -5,17 +5,23 @@ import ru.zavoyko.framework.di.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.exceptions.ComponentBindException;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
+import ru.zavoyko.framework.di.source.ComponentSource;
 import ru.zavoyko.framework.di.source.Definition;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class BasicComponentFactory implements ComponentFactory {
 
     private BasicContext context;
+    private Map<String, ComponentSource> componentSourceMap;
 
-    public BasicComponentFactory(BasicContext context) {
+    public BasicComponentFactory(BasicContext context, Map<String, ComponentSource> componentSourceMap) {
         this.context = context;
+        this.componentSourceMap = Collections.unmodifiableMap(componentSourceMap);
     }
 
     @Override
@@ -64,7 +70,7 @@ public class BasicComponentFactory implements ComponentFactory {
 
     @SneakyThrows
     public Object getInstanceByDefinition(Definition definition) {
-        return definition.getType().getDeclaredConstructor().newInstance();
+        return componentSourceMap.get(definition.getComponentSourceName()).getInstanceByDefinition(definition);
     }
 
     public Set<ComponentProcessor> componentProcessors() {

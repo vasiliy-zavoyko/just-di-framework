@@ -7,6 +7,7 @@ import ru.zavoyko.framework.di.processors.impl.java.JavaComponentProcessor;
 import ru.zavoyko.framework.di.properties.PropertiesLoader;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class InjectPropertyComponentProcessorImpl extends JavaComponentProcessor {
@@ -22,7 +23,8 @@ public class InjectPropertyComponentProcessorImpl extends JavaComponentProcessor
     @SneakyThrows
     public void process(BasicContext context, Object component) {
         final var implClass = component.getClass();
-        for (Field field : getFields(implClass)) {
+        final var fields = getFields(implClass, new ArrayList<Field>());
+        for (Field field : fields) {
             if (field.isAnnotationPresent(InjectProperty.class)) {
                 final var annotation = field.getAnnotation(InjectProperty.class);
                 final var value = (annotation.value().isEmpty()) ?
@@ -32,6 +34,5 @@ public class InjectPropertyComponentProcessorImpl extends JavaComponentProcessor
             }
         }
     }
-
 
 }

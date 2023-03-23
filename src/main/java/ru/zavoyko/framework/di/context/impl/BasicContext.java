@@ -18,7 +18,7 @@ public class BasicContext extends AbstractContext {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicContext.class);
 
-    private final Map<Class, Object> singltonsMap;
+    private final Map<Class, Object> singletonMap;
     private ComponentFactory factory;
     @Getter
     private final Map<String, Definition> definitions;
@@ -30,7 +30,7 @@ public class BasicContext extends AbstractContext {
     private Set<Definition> componentsDefinitions;
 
     public BasicContext(Map<String, Definition> definitionsMap) {
-        this.singltonsMap = new ConcurrentHashMap<>();
+        this.singletonMap = new ConcurrentHashMap<>();
         this.definitions = unmodifiableMap(definitionsMap);
     }
 
@@ -47,7 +47,7 @@ public class BasicContext extends AbstractContext {
         definitions.values().stream()
                 .filter(item -> !item.isComponent())
                 .map(Definition::getType)
-                .filter(item -> ComponentProcessor.class.isAssignableFrom(item))
+                .filter(ComponentProcessor.class::isAssignableFrom)
                 .map(this::createComponentProcessor)
                 .forEach(componentProcessors::add);
         this.componentProcessors = unmodifiableSet(componentProcessors);
@@ -58,7 +58,7 @@ public class BasicContext extends AbstractContext {
         definitions.values().stream()
                 .filter(item -> !item.isComponent())
                 .map(Definition::getType)
-                .filter(item -> ActionsProcessor.class.isAssignableFrom(item))
+                .filter(ActionsProcessor.class::isAssignableFrom)
                 .map(this::createActionProcessor)
                 .forEach(actionsProcessors::add);
         this.actionsProcessors = unmodifiableSet(actionsProcessors);
@@ -77,13 +77,13 @@ public class BasicContext extends AbstractContext {
                 .filter(Definition::isSingleton)
                 .filter(definition -> !definition.isLazy())
                 .forEach(definition -> {
-                    if (singltonsMap.containsKey(definition.getType())) {
+                    if (singletonMap.containsKey(definition.getType())) {
                         return;
                     }
                     final var component = this.getComponent(definition.getType());
-                    singltonsMap.put(definition.getType(), component);
+                    singletonMap.put(definition.getType(), component);
                 });
-        logger.warn("Singletons: {}", singltonsMap);
+        logger.warn("Singletons: {}", singletonMap);
         logger.warn("Context initialized");
     }
 
@@ -91,19 +91,19 @@ public class BasicContext extends AbstractContext {
     public <T> T getComponent(Class<T> type) {
         Class<? extends T> instance = type;
         if (type.isInterface()) {
-            for(var singl : singltonsMap.values()) {
-                if (type.isInstance(singl)) {
-                    return (T) singl;
+            for(var singleton : singletonMap.values()) {
+                if (type.isInstance(singleton)) {
+                    return (T) singleton;
                 }
             }
         }
         final var definition = getAndCheckDefinition(instance);
         if (definition.isSingleton()) {
-            if (singltonsMap.containsKey(instance)) {
-                return (T) singltonsMap.get(instance);
+            if (singletonMap.containsKey(instance)) {
+                return (T) singletonMap.get(instance);
             } else {
                 final var component = factory.createComponent(instance);
-                singltonsMap.put(definition.getType(), component);
+                singletonMap.put(definition.getType(), component);
                 return component;
             }
         }

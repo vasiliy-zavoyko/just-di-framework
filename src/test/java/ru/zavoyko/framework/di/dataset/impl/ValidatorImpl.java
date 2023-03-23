@@ -7,7 +7,7 @@ import ru.zavoyko.framework.di.inject.InjectProperty;
 import ru.zavoyko.framework.di.inject.java.TypeToInject;
 
 @TypeToInject
-public class ValidatorImpl implements Validator {
+public abstract class ValidatorImpl implements Validator {
 
     private final static Logger logger = LoggerFactory.getLogger(ValidatorImpl.class);
 
