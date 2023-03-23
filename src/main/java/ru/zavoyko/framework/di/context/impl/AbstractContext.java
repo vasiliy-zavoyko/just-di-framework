@@ -27,7 +27,7 @@ public abstract class AbstractContext implements Context {
         if (type.isInterface()) {
             final var definitions = componentsDefinitions().stream()
                     .filter(definition -> definition.getComponentAliases().contains(type.getCanonicalName()))
-                    .collect(Collectors.toList());
+                    .toList();
             if (definitions.size() > 1) {
                 throw new ComponentBindException("More than one implementation found for " + type.getCanonicalName());
             }

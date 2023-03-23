@@ -14,7 +14,6 @@ public class BasicComponentFactory implements ComponentFactory {
 
     private BasicContext context;
 
-
     public BasicComponentFactory(BasicContext context) {
         this.context = context;
     }
@@ -24,7 +23,7 @@ public class BasicComponentFactory implements ComponentFactory {
     public <T> T createComponent(Class<T> componentClass) {
         Definition deferredDefinition = getDefinitionByClass(componentClass);
         var newInstance = getInstanceByDefinition(deferredDefinition);
-        newInstance = setDependencies(newInstance);
+        setDependencies(newInstance);
         newInstance = setActions(newInstance);
         if (componentClass.isInstance(newInstance)) {
             return (T) newInstance ;
@@ -36,7 +35,7 @@ public class BasicComponentFactory implements ComponentFactory {
         if (componentClass.isInterface()) {
             final var definitions = context.getComponentsDefinitions().stream()
                     .filter(definition -> definition.getComponentAliases().contains(componentClass.getCanonicalName()))
-                    .collect(Collectors.toList());
+                    .toList();
             if (definitions.size() > 1) {
                 throw new ComponentBindException("More than one implementation found for " + componentClass.getCanonicalName());
             }
@@ -48,12 +47,11 @@ public class BasicComponentFactory implements ComponentFactory {
         }
     }
 
-    public Object setDependencies(Object instance) {
+    public void setDependencies(Object instance) {
         Object newInstance = instance;
         for (ComponentProcessor processor : componentProcessors()) {
-            newInstance = processor.process(context, newInstance);
+            processor.process(context, newInstance);
         }
-        return newInstance;
     }
 
     private Object setActions(Object newInstance) {

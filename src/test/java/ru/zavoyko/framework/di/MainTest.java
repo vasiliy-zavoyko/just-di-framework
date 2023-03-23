@@ -6,7 +6,7 @@ import ru.zavoyko.framework.di.dataset.*;
 
 public class MainTest {
 
-    Logger logger = LoggerFactory.getLogger(MainTest.class);
+    private final static Logger logger = LoggerFactory.getLogger(MainTest.class);
 
     @org.junit.jupiter.api.Test
     void testRun() {
@@ -15,7 +15,6 @@ public class MainTest {
         testOutput();
         starter.start();
     }
-
 
     private void testOutput() {
         logger.info("Hello world!");

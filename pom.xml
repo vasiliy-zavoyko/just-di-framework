@@ -24,6 +24,8 @@
         <lombok.version>1.18.26</lombok.version>
         <guava.version>31.1-jre</guava.version>
         <commons.cli.version>1.5.0</commons.cli.version>
+        <log4.version>2.20.0</log4.version>
+        <cglib.version>3.3.0</cglib.version>
         <junit5.version>5.8.2</junit5.version>
         <mockito.version>4.6.1</mockito.version>
     </properties>
@@ -63,22 +65,22 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.20.0</version>
+            <version>${log4.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.20.0</version>
+            <version>${log4.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.20.0</version>
+            <version>${log4.version}</version>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
-            <version>3.3.0</version>
+            <version>${cglib.version}</version>
         </dependency>
         <!-- Test Dependencies -->
         <dependency>
@@ -132,6 +134,7 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.resources.plugin}</version>
             </plugin>

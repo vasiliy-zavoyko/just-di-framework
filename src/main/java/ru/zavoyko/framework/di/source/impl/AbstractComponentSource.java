@@ -16,16 +16,12 @@ public abstract class AbstractComponentSource implements ComponentSource {
     public Set<Definition> getDefinitions() {
         final var definitions = new HashSet<Definition>();
 
-        final var setOfTypes = getTypeToInjectClasses();
-
-        for (var item : setOfTypes) {
+        for (var item : getTypeToInjectClasses()) {
             final var componentDefinition = getComponentDefinition(item);
             definitions.add(componentDefinition);
         }
 
-        final var subTypesOfComponentProcessor = getComponentProcessorClasses();
-
-        for (var item : subTypesOfComponentProcessor) {
+        for (var item : getComponentProcessorClasses()) {
             final var componentDefinition = getComponentDefinition(item);
             definitions.add(componentDefinition);
         }

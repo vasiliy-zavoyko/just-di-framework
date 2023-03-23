@@ -25,10 +25,8 @@ public class PropertiesLoader {
      * @return The map of the properties.
      */
     public Map<String, String> loadProperties(String propertyName) {
-        try {
-            final var resource = getResource(propertyName);
-            return new BufferedReader(new InputStreamReader(resource.openStream()))
-                    .lines()
+        try (final var properties = new BufferedReader(new InputStreamReader(getResource(propertyName).openStream()))) {
+            return properties.lines()
                     .map(String::trim)
                     .map(line -> line.split("="))
                     .collect(Collectors.toMap(line -> line[0].trim(), line -> line[1].trim()));

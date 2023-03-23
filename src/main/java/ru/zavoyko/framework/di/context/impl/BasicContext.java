@@ -16,7 +16,7 @@ import static java.util.Collections.unmodifiableSet;
 
 public class BasicContext extends AbstractContext {
 
-    Logger logger = LoggerFactory.getLogger(BasicContext.class);
+    private static final Logger logger = LoggerFactory.getLogger(BasicContext.class);
 
     private final Map<Class, Object> singltonsMap;
     private ComponentFactory factory;

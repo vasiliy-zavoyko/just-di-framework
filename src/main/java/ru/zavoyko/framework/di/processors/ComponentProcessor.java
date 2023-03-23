@@ -4,6 +4,6 @@ import ru.zavoyko.framework.di.context.impl.BasicContext;
 
 public interface ComponentProcessor {
 
-    Object process(BasicContext context, Object component);
+    void process(BasicContext context, Object component);
 
 }
