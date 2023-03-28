@@ -1,6 +1,5 @@
 package ru.zavoyko.framework.di.context;
 
-import ru.zavoyko.framework.di.factory.BasicComponentFactory;
 import ru.zavoyko.framework.di.factory.ComponentFactory;
 import ru.zavoyko.framework.di.source.Definition;
 
@@ -13,7 +12,5 @@ public interface Context {
     void initContext();
 
     <T> T getComponent(Class<T> type);
-
-    Optional<Definition> getDefinitionByAliasName(String name);
 
 }

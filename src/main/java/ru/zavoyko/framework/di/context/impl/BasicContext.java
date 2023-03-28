@@ -20,18 +20,9 @@ public class BasicContext extends AbstractContext {
 
     private final Map<Class, Object> singletonMap;
     private ComponentFactory factory;
-    @Getter
-    private final Map<String, Definition> definitions;
-    @Getter
-    private Set<ComponentProcessor> componentProcessors;
-    @Getter
-    private Set<ActionsProcessor> actionsProcessors;
-    @Getter
-    private Set<Definition> componentsDefinitions;
 
-    public BasicContext(Map<String, Definition> definitionsMap) {
+    public BasicContext() {
         this.singletonMap = new ConcurrentHashMap<>();
-        this.definitions = unmodifiableMap(definitionsMap);
     }
 
     @Override
@@ -42,38 +33,8 @@ public class BasicContext extends AbstractContext {
     @Override
     public void initContext() {
         logger.warn("Initializing context");
-        logger.warn("Preparing component processors");
-        final var componentProcessors = new HashSet<ComponentProcessor>();
-        definitions.values().stream()
-                .filter(item -> !item.isComponent())
-                .map(Definition::getType)
-                .filter(ComponentProcessor.class::isAssignableFrom)
-                .map(this::createComponentProcessor)
-                .forEach(componentProcessors::add);
-        this.componentProcessors = unmodifiableSet(componentProcessors);
-        logger.warn("Component processors: {}", componentProcessors);
-
-        logger.warn("Preparing actions processors");
-        final var actionsProcessors = new HashSet<ActionsProcessor>();
-        definitions.values().stream()
-                .filter(item -> !item.isComponent())
-                .map(Definition::getType)
-                .filter(ActionsProcessor.class::isAssignableFrom)
-                .map(this::createActionProcessor)
-                .forEach(actionsProcessors::add);
-        this.actionsProcessors = unmodifiableSet(actionsProcessors);
-        logger.warn("Actions processors: {}", actionsProcessors);
-
-        logger.warn("Preparing components");
-        final var componentDefinitions = new HashSet<Definition>();
-        definitions.values().stream()
-                .filter(Definition::isComponent)
-                .forEach(componentDefinitions::add);
-        this.componentsDefinitions = unmodifiableSet(componentDefinitions);
-        logger.warn("Components: {}", componentsDefinitions);
-
         logger.warn("Preparing singletons");
-        componentsDefinitions.stream()
+        factory.getComponentsDefinitions().stream()
                 .filter(Definition::isSingleton)
                 .filter(definition -> !definition.isLazy())
                 .forEach(definition -> {
@@ -97,7 +58,7 @@ public class BasicContext extends AbstractContext {
                 }
             }
         }
-        final var definition = getAndCheckDefinition(instance);
+        final var definition = factory.getAndCheckDefinition(instance);
         if (definition.isSingleton()) {
             if (singletonMap.containsKey(instance)) {
                 return (T) singletonMap.get(instance);
@@ -108,16 +69,6 @@ public class BasicContext extends AbstractContext {
             }
         }
         return factory.createComponent(instance);
-    }
-
-    @Override
-    protected Map<String, Definition> definitions() {
-        return definitions;
-    }
-
-    @Override
-    protected Set<Definition> componentsDefinitions() {
-        return componentsDefinitions;
     }
 
 }

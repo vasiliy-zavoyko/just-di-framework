@@ -10,10 +10,8 @@ import java.util.*;
 
 public abstract class AbstractComponentSource implements ComponentSource {
 
-    protected abstract String getPackageToScan();
-
     @Override
-    public Set<Definition> getDefinitions() {
+    public Set<Definition> findAllDefinitions() {
         final var definitions = new HashSet<Definition>();
 
         for (var item : getTypeToInjectClasses()) {

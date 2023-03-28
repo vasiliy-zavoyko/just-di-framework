@@ -49,7 +49,7 @@ public class JavaObjectComponentSource extends AbstractComponentSource {
     }
 
     @Override
-    protected String getPackageToScan() {
+    public String getPackageToScan() {
         return packageToScan;
     }
 

@@ -9,6 +9,8 @@ import ru.zavoyko.framework.di.dataset.impl.TestRunnerImpl;
 import ru.zavoyko.framework.di.inject.InjectByType;
 import ru.zavoyko.framework.di.inject.java.TypeToInject;
 
+import javax.annotation.PostConstruct;
+
 @TypeToInject
 public class Starter {
 
@@ -31,7 +33,12 @@ public class Starter {
         printer.log("Start");
         testRunner.run();
         testRunner.run();
-        logger.info("Start");
+        logger.info("End");
+    }
+
+    @PostConstruct
+    public void init() {
+        logger.info("Init");
     }
 
 }

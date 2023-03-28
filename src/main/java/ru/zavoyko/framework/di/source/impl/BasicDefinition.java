@@ -3,13 +3,16 @@ package ru.zavoyko.framework.di.source.impl;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.zavoyko.framework.di.source.Definition;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 
-@Builder
+@Getter
+@Builder()
 @RequiredArgsConstructor
 public class BasicDefinition implements Definition {
 
@@ -21,46 +24,6 @@ public class BasicDefinition implements Definition {
     private final boolean isLazy;
     private final boolean isComponent;
     private final Class type;
-
-    @Override
-    public boolean isSingleton() {
-        return isSingleton;
-    }
-
-    @Override
-    public boolean isLazy() {
-        return isLazy;
-    }
-
-    @Override
-    public boolean isComponent() {
-        return isComponent;
-    }
-
-    @Override
-    public String getComponentSourceName() {
-        return componentSourceName;
-    }
-
-    @Override
-    public String getComponentClassName() {
-        return componentClassName;
-    }
-
-    @Override
-    public String getComponentName() {
-        return componentName;
-    }
-
-    @Override
-    public List<String> getComponentAliases() {
-        return componentAliases;
-    }
-
-    @Override
-    public Class getType() {
-        return type;
-    }
 
     @Override
     public boolean equals(Object o) {
