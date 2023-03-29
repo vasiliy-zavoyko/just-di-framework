@@ -3,12 +3,14 @@ package ru.zavoyko.framework.di.dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.zavoyko.framework.di.Analyst;
+import ru.zavoyko.framework.di.inject.TypeToInject;
 
-public class BusinesAnalist implements Analyst {
+@TypeToInject
+public class BusinessAnalyst implements Analyst {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BusinesAnalist.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessAnalyst.class);
 
-    public BusinesAnalist() {
+    public BusinessAnalyst() {
         LOGGER.debug("Business analyst object created, class: {}", this.getClass().getName());
     }
 

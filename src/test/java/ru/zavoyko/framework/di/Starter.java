@@ -4,23 +4,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.zavoyko.framework.di.dataset.JavaDeveloper;
 import ru.zavoyko.framework.di.dataset.JavaScriptDeveloper;
-import ru.zavoyko.framework.di.dataset.ProjectManager;
+import ru.zavoyko.framework.di.functions.TimeMeter;
+import ru.zavoyko.framework.di.inject.InjectByType;
+import ru.zavoyko.framework.di.inject.TypeToInject;
 
+
+@TypeToInject
 public class Starter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Starter.class);
 
-    private final Developer javaDeveloper;
-    private final Developer javaScriptDeveloper;
-    private final Manager projectManager;
+    @InjectByType(value = JavaDeveloper.class)
+    private Developer javaDeveloper;
+    @InjectByType(value = JavaScriptDeveloper.class)
+    private Developer javaScriptDeveloper;
+    @InjectByType
+    private Manager projectManager;
 
     public Starter() {
         LOGGER.debug("Starter object created, class: {}", this.getClass().getName());
-        javaDeveloper = new JavaDeveloper();
-        javaScriptDeveloper = new JavaScriptDeveloper();
-        projectManager = new ProjectManager();
     }
 
+    @TimeMeter
     public void start() {
         LOGGER.info("Start");
         projectManager.talk();
