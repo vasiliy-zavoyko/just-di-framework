@@ -1,15 +1,15 @@
-package ru.zavoyko.framework.di.actions.time;
+package ru.zavoyko.framework.di.processors.actions.impl;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.zavoyko.framework.di.actions.ActionsProcessor;
+import ru.zavoyko.framework.di.actions.time.TimeToRun;
+import ru.zavoyko.framework.di.processors.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.utils.ReflectionUtils;
 
 import java.lang.reflect.Method;
-import java.util.Set;
 
 public class TimeToRunActionProcessor implements ActionsProcessor {
 

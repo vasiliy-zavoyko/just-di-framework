@@ -1,13 +1,12 @@
 package ru.zavoyko.framework.di.source.impl.java;
 
 import org.reflections.Reflections;
-import ru.zavoyko.framework.di.actions.ActionsProcessor;
+import ru.zavoyko.framework.di.processors.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.exceptions.DIFrameworkInstantiationException;
 import ru.zavoyko.framework.di.inject.java.TypeToInject;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.Definition;
 import ru.zavoyko.framework.di.source.impl.AbstractComponentSource;
-import ru.zavoyko.framework.di.source.impl.BasicDefinition;
 import ru.zavoyko.framework.di.source.impl.java.exceptions.JavaObjectSourceProcessorException;
 import ru.zavoyko.framework.di.utils.ReflectionUtils;
 

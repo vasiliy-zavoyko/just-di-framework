@@ -1,7 +1,6 @@
-package ru.zavoyko.framework.di.processors.impl.java;
+package ru.zavoyko.framework.di.processors.component.impl.java;
 
 import ru.zavoyko.framework.di.context.Context;
-import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.inject.InjectByType;
 
 public class InjectByTypeComponentProcessorImpl extends JavaComponentProcessor {

@@ -1,18 +1,12 @@
 package ru.zavoyko.framework.di.context.impl;
 
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.zavoyko.framework.di.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.factory.ComponentFactory;
-import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.Definition;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
 
 public class BasicContext extends AbstractContext {
 

@@ -3,20 +3,13 @@ package ru.zavoyko.framework.di;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
-import ru.zavoyko.framework.di.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.factory.impl.BasicComponentFactory;
-import ru.zavoyko.framework.di.processors.ComponentProcessor;
-import ru.zavoyko.framework.di.source.Definition;
 import ru.zavoyko.framework.di.source.ComponentSource;
 import ru.zavoyko.framework.di.source.impl.java.JavaObjectComponentSource;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DIFramework {

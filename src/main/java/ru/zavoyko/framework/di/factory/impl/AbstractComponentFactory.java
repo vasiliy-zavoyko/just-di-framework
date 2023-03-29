@@ -1,16 +1,12 @@
 package ru.zavoyko.framework.di.factory.impl;
 
-import ru.zavoyko.framework.di.actions.ActionsProcessor;
+import ru.zavoyko.framework.di.processors.actions.ActionsProcessor;
 import ru.zavoyko.framework.di.context.Context;
-import ru.zavoyko.framework.di.exceptions.DIFrameworkComponentBindException;
 import ru.zavoyko.framework.di.factory.ComponentFactory;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
-import ru.zavoyko.framework.di.source.Definition;
 import ru.zavoyko.framework.di.utils.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 
