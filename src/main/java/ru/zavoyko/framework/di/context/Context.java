@@ -13,4 +13,6 @@ public interface Context {
 
     <T> T getComponent(Class<T> type);
 
+    Object getComponent(String name);
+
 }

@@ -1,9 +1,7 @@
 package ru.zavoyko.framework.di.factory.impl;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.zavoyko.framework.di.actions.ActionsProcessor;
@@ -13,13 +11,14 @@ import ru.zavoyko.framework.di.exceptions.DIFrameworkComponentBindException;
 import ru.zavoyko.framework.di.processors.ComponentProcessor;
 import ru.zavoyko.framework.di.source.ComponentSource;
 import ru.zavoyko.framework.di.source.Definition;
-import ru.zavoyko.framework.di.utils.ReflectionUtils;
 
 import javax.annotation.Nonnull;
-import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PRIVATE;
+
+@RequiredArgsConstructor(access = PRIVATE)
 @Builder
 public class BasicComponentFactory extends AbstractComponentFactory {
 
@@ -29,54 +28,45 @@ public class BasicComponentFactory extends AbstractComponentFactory {
     private final BasicContext context;
     @Nonnull
     private final Map<String, ComponentSource> componentSourceMap;
-    @Nonnull
-    @Getter
-    private final Map<String, Definition> definitions;
-    @Nonnull
-    @Getter
-    private final Set<ComponentProcessor> componentProcessors;
-    @Nonnull
-    @Getter
-    private final Set<ActionsProcessor> actionsProcessors;
-    @Nonnull
-    @Getter
-    private final Set<Definition> componentsDefinitions;
 
     @Override
-    public <T> T createComponent(Class<T> componentClass) {
-        Definition deferredDefinition = getDefinitionByClass(componentClass);
-        var newInstance = getInstanceByDefinition(deferredDefinition);
+    public Object createComponent(Definition definition) {
+        var newInstance = getInstance(definition);
         setDependencies(newInstance);
         runInitMethod(newInstance);
         newInstance = setActions(newInstance);
-        if (componentClass.isInstance(newInstance)) {
-            return (T) newInstance ;
-        }
-        throw new DIFrameworkComponentBindException("No implementation found for " + componentClass.getCanonicalName());
+        return newInstance;
+    }
+
+    @Override
+    public Set<Definition> getComponentsDefinitions() {
+        return componentSourceMap.values().stream()
+                .map(ComponentSource::getComponentDefinitions)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
 
-    public Object getInstanceByDefinition(Definition definition) {
+    public Object getInstance(Definition definition) {
         return componentSourceMap.get(definition.getComponentSourceName()).getInstanceByDefinition(definition);
     }
 
     @Override
     public Set<ComponentProcessor> getComponentProcessors() {
-        return componentProcessors;
-    }
-
-    public void setComponentProcessors(Set<ComponentProcessor> componentProcessorsToSet) {
-        this.componentProcessors.addAll(componentProcessors);
+        return componentSourceMap.values().stream()
+                .map(ComponentSource::getComponentProcessors)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<ActionsProcessor> getActionProcessors() {
-        return actionsProcessors;
+        return componentSourceMap.values().stream()
+                .map(ComponentSource::getActionProcessors)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
-    public void setActionsProcessors(Set<ActionsProcessor> actionsProcessorsToSet) {
-        this.actionsProcessors.addAll(actionsProcessorsToSet);
-    }
 
     @Override
     public Context getContext() {

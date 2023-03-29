@@ -16,34 +16,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicDefinition implements Definition {
 
-    private final String componentName;
-    private final String componentClassName;
+    @Nonnull
+    private final String name;
+    @Nonnull
     private final String componentSourceName;
+    @Nonnull
     private final List<String> componentAliases;
+    @Nonnull
     private final boolean isSingleton;
+    @Nonnull
     private final boolean isLazy;
-    private final boolean isComponent;
-    private final Class type;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BasicDefinition that)) return false;
-        return Objects.equal(getComponentName(), that.getComponentName());
+        return Objects.equal(this.getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getComponentName());
+        return Objects.hashCode(this.getName());
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("componentName", componentName)
-                .add("isSingleton", isSingleton)
-                .add("isComponent", isComponent)
+                .add("componentName", name)
                 .toString();
+    }
+
+    @Override
+    public int compareTo(Definition definition) {
+        return this.getName().compareTo(definition.getName());
     }
 
 }
