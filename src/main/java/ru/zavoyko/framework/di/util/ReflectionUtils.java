@@ -4,9 +4,11 @@ package ru.zavoyko.framework.di.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.zavoyko.framework.di.exceptions.DIFrameworkInstansiationException;
+import ru.zavoyko.framework.di.exceptions.DiFrameworkInvokeMethodException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,6 +17,14 @@ import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReflectionUtils {
+
+    public static void invokeMethod(Object instance, Method method, Object... args) {
+        try {
+            method.invoke(instance, args);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new DiFrameworkInvokeMethodException("Something Happened =O...", e);
+        }
+    }
 
     public static Set<Field> getFieldAnnotatedBy(Object object, Class<? extends Annotation> annotation) {
         return getAllFields(object.getClass() , new HashSet<Field>()).stream()

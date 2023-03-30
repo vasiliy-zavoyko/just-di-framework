@@ -8,6 +8,8 @@ import ru.zavoyko.framework.di.functions.TimeMeter;
 import ru.zavoyko.framework.di.inject.InjectByType;
 import ru.zavoyko.framework.di.inject.TypeToInject;
 
+import javax.annotation.PostConstruct;
+
 
 @TypeToInject
 public class Starter {
@@ -23,6 +25,11 @@ public class Starter {
 
     public Starter() {
         LOGGER.debug("Starter object created, class: {}", this.getClass().getName());
+    }
+
+    @PostConstruct
+    public void init() {
+        LOGGER.info("HELLO, I am initializing...");
     }
 
     @TimeMeter

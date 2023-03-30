@@ -6,4 +6,7 @@ public abstract class DIFrameworkException extends RuntimeException {
         super(message);
     }
 
+    public DIFrameworkException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -9,7 +9,10 @@ import ru.zavoyko.framework.di.exceptions.DIFrameworkInstansiationException;
 import ru.zavoyko.framework.di.processors.component.ComponentProcessor;
 import ru.zavoyko.framework.di.processors.functions.FunctionProcessor;
 import ru.zavoyko.framework.di.source.JavaObjectSource;
+import ru.zavoyko.framework.di.util.ReflectionUtils;
 
+import javax.annotation.PostConstruct;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +54,14 @@ public class ObjectFactory {
         for (FunctionProcessor functionProcessor : functionProcessorSet) {
             instance = (T) functionProcessor.process(context, instance);
         }
+
+        final var insstForRun = instance;
+        ReflectionUtils.getMethodAnnotatedBy(instance, PostConstruct.class).stream()
+                .findFirst()
+                .ifPresent(item -> {
+                    ReflectionUtils.invokeMethod(insstForRun, item, null);
+                });
+
 
         return instance;
     }
