@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BasicContext extends AbstractContext {
 
-    private static final Logger logger = LoggerFactory.getLogger(BasicContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasicContext.class);
 
     private final Map<Definition, Object> singletonMap;
 
@@ -23,44 +23,48 @@ public class BasicContext extends AbstractContext {
     }
 
     @Override
-    public void setFactory(ComponentFactory factory) {
-        this.factory = factory;
+    public void setFactory(ComponentFactory componentFactory) {
+        this.factory = componentFactory;
     }
 
     @Override
     public void initContext() {
-        logger.warn("Initializing context");
-        logger.warn("Preparing singletons");
+        LOGGER.warn("Initializing context");
+        LOGGER.warn("Preparing singletons");
         factory.getComponentsDefinitions().stream()
                 .filter(Definition::isSingleton)
                 .filter(definition -> !definition.isLazy())
                 .forEach(definition -> {
-                    logger.warn("Initializing singleton {}", definition.getName());
+                    LOGGER.warn("Initializing singleton {}", definition.getName());
                     if (singletonMap.containsKey(definition)) {
                         return;
                     }
                     final var component = factory.createComponent(definition);
                     singletonMap.put(definition, component);
                 });
-        logger.warn("Singletons: {}", singletonMap);
-        logger.warn("Context initialized");
+        LOGGER.warn("Singletons: {}", singletonMap);
+        LOGGER.warn("Context initialized");
     }
 
     @Override
     public <T> T getComponent(final Class<T> type) {
+        T component;
 
-        T component = null;
-
-        final var checkDefinition = getAndCheckOneDefinitionOrThrowException(type);
-        if (checkDefinition.isSingleton()) {
-            if (singletonMap.containsKey(checkDefinition)) {
-                return (T) singletonMap.get(checkDefinition);
+        try {
+            final var checkDefinition = getAndCheckOneDefinitionOrThrowException(type);
+            if (checkDefinition.isSingleton()) {
+                if (singletonMap.containsKey(checkDefinition)) {
+                    return type.cast(singletonMap.get(checkDefinition));
+                } else {
+                    component = type.cast(factory.createComponent(checkDefinition));
+                    singletonMap.put(checkDefinition, component);
+                }
             } else {
-                component = (T) factory.createComponent(checkDefinition);
-                singletonMap.put(checkDefinition, component);
+                component = type.cast(factory.createComponent(checkDefinition));
             }
-        } else {
-            component = (T) factory.createComponent(checkDefinition);
+
+        } catch (ClassCastException e) {
+            throw new DIFrameworkComponentBindException("No implementation found for " + type.getCanonicalName(), e);
         }
 
         if (type.isAssignableFrom(component.getClass())) {

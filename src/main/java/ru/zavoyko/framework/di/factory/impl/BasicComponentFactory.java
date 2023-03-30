@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PRIVATE;
 
-@RequiredArgsConstructor(access = PRIVATE)
 @Builder
+@RequiredArgsConstructor(access = PRIVATE)
 public class BasicComponentFactory extends AbstractComponentFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(BasicComponentFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasicComponentFactory.class);
 
     @Nonnull
     private final BasicContext context;

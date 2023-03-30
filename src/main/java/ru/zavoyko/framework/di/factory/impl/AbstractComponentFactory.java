@@ -13,15 +13,14 @@ import java.util.Set;
 public abstract class AbstractComponentFactory implements ComponentFactory {
 
     protected void runInitMethod(Object instance) {
-        ReflectionUtils.getAllMethodsByAnnotation(instance.getClass(), PostConstruct.class).forEach(method -> {
-                ReflectionUtils.invokeMethod(method, instance, null);
-        });
+        ReflectionUtils.getAllMethodsByAnnotation(instance.getClass(), PostConstruct.class).forEach(method ->
+                ReflectionUtils.invokeMethod(method, instance, null)
+        );
     }
 
-    protected void setDependencies(Object instance) {
-        Object newInstance = instance;
+    protected void setDependencies(final Object instance) {
         for (ComponentProcessor processor : getComponentProcessors()) {
-            processor.process(getContext(), newInstance);
+            processor.process(getContext(), instance);
         }
     }
 

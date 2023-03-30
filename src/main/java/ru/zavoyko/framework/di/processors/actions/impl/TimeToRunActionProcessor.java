@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 
 public class TimeToRunActionProcessor implements ActionsProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(TimeToRunActionProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeToRunActionProcessor.class);
 
     @Override
     public Object applyAction(final Context context, final Object component) {
@@ -29,11 +29,11 @@ public class TimeToRunActionProcessor implements ActionsProcessor {
         final var methodInterceptor = new InvocationHandler() {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                logger.info("Method {} was invoked", method.getName());
+                LOGGER.info("Method {} was invoked", method.getName());
                 final var beforeTime = System.nanoTime();
                 final var invokeResult = method.invoke(component, args);
                 final var afterTime = System.nanoTime();
-                logger.info("Method {} was executed for {} nanoseconds", method.getName(), afterTime - beforeTime);
+                LOGGER.info("Method {} was executed for {} nanoseconds", method.getName(), afterTime - beforeTime);
                 return invokeResult;
             }
         };

@@ -1,12 +1,9 @@
 package ru.zavoyko.framework.di.properties;
 
-import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,7 +13,7 @@ import static com.google.common.io.Resources.getResource;
 public class PropertiesLoader {
 
     public Map<String, String> loadProperties(String propertyName) {
-        try (final var properties = new BufferedReader(new InputStreamReader(getResource(propertyName).openStream()))) {
+        try (var properties = new BufferedReader(new InputStreamReader(getResource(propertyName).openStream()))) {
             return properties.lines()
                     .map(String::trim)
                     .map(line -> line.split("="))

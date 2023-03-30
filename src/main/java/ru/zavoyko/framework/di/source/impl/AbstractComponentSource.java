@@ -5,7 +5,6 @@ import ru.zavoyko.framework.di.inject.java.TypeToInject;
 import ru.zavoyko.framework.di.source.ComponentSource;
 import ru.zavoyko.framework.di.source.Definition;
 import ru.zavoyko.framework.di.source.impl.java.exceptions.JavaObjectSourceInstanceCreationException;
-import ru.zavoyko.framework.di.source.impl.java.exceptions.JavaObjectSourceProcessorException;
 import ru.zavoyko.framework.di.utils.ReflectionUtils;
 
 import java.util.*;
@@ -19,13 +18,13 @@ public abstract class AbstractComponentSource implements ComponentSource {
         return BasicDefinition.builder()
                 .isLazy(typeToInject.isLazy())
                 .isSingleton(typeToInject.isSingleton())
-                .componentSourceName(getPackageToScan())
+                .componentSourceName(getSourcePackage())
                 .name(canonicalName)
                 .componentAliases(aliases)
                 .build();
     }
 
-    protected LinkedList<String> getAliases(Class<?> item, LinkedList<String> aliases) {
+    protected List<String> getAliases(Class<?> item, List<String> aliases) {
         if (item.getSuperclass() == null) {
             return aliases;
         }
@@ -40,9 +39,9 @@ public abstract class AbstractComponentSource implements ComponentSource {
             final Class<?> clazz = Class.forName(definition.getName(), true, this.getClass().getClassLoader());
             return ReflectionUtils.createInstance(clazz);
         } catch (DIFrameworkInstantiationException e) {
-            throw new JavaObjectSourceInstanceCreationException("Can't create instance of the class: " + definition.getName());
+            throw new JavaObjectSourceInstanceCreationException("Can't create instance of the class: " + definition.getName(), e);
         } catch (ClassNotFoundException e) {
-            throw new JavaObjectSourceInstanceCreationException("Can't find class: " + definition.getName());
+            throw new JavaObjectSourceInstanceCreationException("Can't find class: " + definition.getName(), e);
         }
     }
 

@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface ComponentSource {
 
-    String getPackageToScan();
+    String getSourcePackage();
 
     Object getInstanceByDefinition(Definition definition);
 

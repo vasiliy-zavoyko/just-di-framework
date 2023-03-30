@@ -2,7 +2,6 @@ package ru.zavoyko.framework.di;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
 import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.context.impl.BasicContext;
 import ru.zavoyko.framework.di.factory.impl.BasicComponentFactory;

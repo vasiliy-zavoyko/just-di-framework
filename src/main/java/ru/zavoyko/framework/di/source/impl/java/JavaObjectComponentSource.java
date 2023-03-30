@@ -19,17 +19,16 @@ import java.util.stream.Collectors;
  */
 public class JavaObjectComponentSource extends AbstractComponentSource {
 
-    private final String packageToScan;
+    private final String sourcePackage;
     private final Reflections scanner;
 
     public JavaObjectComponentSource(String packageToScan) {
-        this.packageToScan = packageToScan;
+        this.sourcePackage = packageToScan;
         this.scanner = new Reflections(packageToScan);
     }
 
     @Override
     public Set<Definition> getComponentDefinitions() {
-        final var scanner = new Reflections(packageToScan);
         return scanner.getTypesAnnotatedWith(TypeToInject.class, true).stream()
                 .filter(clazz -> !clazz.isInterface())
                 .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
@@ -68,8 +67,8 @@ public class JavaObjectComponentSource extends AbstractComponentSource {
     }
 
     @Override
-    public String getPackageToScan() {
-        return packageToScan;
+    public String getSourcePackage() {
+        return sourcePackage;
     }
 
 }

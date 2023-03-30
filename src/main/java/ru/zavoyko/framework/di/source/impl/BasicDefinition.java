@@ -22,9 +22,7 @@ public class BasicDefinition implements Definition {
     private final String componentSourceName;
     @Nonnull
     private final List<String> componentAliases;
-    @Nonnull
     private final boolean isSingleton;
-    @Nonnull
     private final boolean isLazy;
 
     @Override
