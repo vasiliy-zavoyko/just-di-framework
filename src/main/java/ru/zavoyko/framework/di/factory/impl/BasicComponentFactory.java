@@ -45,7 +45,6 @@ public class BasicComponentFactory extends AbstractComponentFactory {
                 .collect(Collectors.toSet());
     }
 
-
     public Object getInstance(Definition definition) {
         return componentSourceMap.get(definition.getComponentSourceName()).getInstanceByDefinition(definition);
     }
@@ -65,7 +64,6 @@ public class BasicComponentFactory extends AbstractComponentFactory {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }
-
 
     @Override
     public Context getContext() {

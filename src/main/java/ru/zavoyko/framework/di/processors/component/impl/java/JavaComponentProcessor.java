@@ -1,5 +1,6 @@
 package ru.zavoyko.framework.di.processors.component.impl.java;
 
+import ru.zavoyko.framework.di.exceptions.DIFrameworkComponentBindException;
 import ru.zavoyko.framework.di.processors.component.AbstractComponentProcessor;
 
 import java.lang.reflect.Field;
@@ -14,7 +15,7 @@ public abstract class JavaComponentProcessor extends AbstractComponentProcessor 
         try {
             field.set(component, fieldInstance);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new DIFrameworkComponentBindException("Failed to set field " + field + " on " + component, e);
         }
     }
 

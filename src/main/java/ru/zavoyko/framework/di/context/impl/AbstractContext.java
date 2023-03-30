@@ -1,10 +1,9 @@
 package ru.zavoyko.framework.di.context.impl;
 
 import ru.zavoyko.framework.di.context.Context;
-import ru.zavoyko.framework.di.exceptions.DIFrameworkComponentBindException;
+import ru.zavoyko.framework.di.exceptions.DIComponentDefinitionException;
 import ru.zavoyko.framework.di.source.Definition;
 
-import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractContext implements Context {
@@ -15,16 +14,16 @@ public abstract class AbstractContext implements Context {
                     .filter(definition -> definition.getComponentAliases().contains(type.getCanonicalName()))
                     .toList();
             if (definitions.size() > 1) {
-                throw new DIFrameworkComponentBindException("More than one implementation found for " + type.getCanonicalName());
+                throw new DIComponentDefinitionException("More than one implementation found for " + type.getCanonicalName());
             }
             return definitions.stream().findFirst()
-                    .orElseThrow( () -> new DIFrameworkComponentBindException("No definition found for interface: " + type.getCanonicalName()));
+                    .orElseThrow( () -> new DIComponentDefinitionException("No definition found for interface: " + type.getCanonicalName()));
         }
 
         return getComponentsDefinitions().stream()
                 .filter(definition -> type.getCanonicalName().equals(definition.getName()))
                 .findFirst()
-                .orElseThrow( () -> new DIFrameworkComponentBindException("No definition found for type: " + type.getCanonicalName()));
+                .orElseThrow( () -> new DIComponentDefinitionException("No definition found for type: " + type.getCanonicalName()));
     }
 
 
@@ -36,7 +35,7 @@ public abstract class AbstractContext implements Context {
                         getComponentsDefinitions().stream()
                                 .filter(definition -> definition.getComponentAliases().contains(aliasName))
                                 .findFirst()
-                                .orElseThrow(() -> new DIFrameworkComponentBindException("No definition found for alias: " + aliasName)));
+                                .orElseThrow(() -> new DIComponentDefinitionException("No definition found for alias: " + aliasName)));
     }
 
     protected abstract Set<Definition> getComponentsDefinitions();

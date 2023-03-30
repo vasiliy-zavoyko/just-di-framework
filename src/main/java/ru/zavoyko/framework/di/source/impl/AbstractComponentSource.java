@@ -4,6 +4,7 @@ import ru.zavoyko.framework.di.exceptions.DIFrameworkInstantiationException;
 import ru.zavoyko.framework.di.inject.java.TypeToInject;
 import ru.zavoyko.framework.di.source.ComponentSource;
 import ru.zavoyko.framework.di.source.Definition;
+import ru.zavoyko.framework.di.source.impl.java.exceptions.JavaObjectSourceInstanceCreationException;
 import ru.zavoyko.framework.di.source.impl.java.exceptions.JavaObjectSourceProcessorException;
 import ru.zavoyko.framework.di.utils.ReflectionUtils;
 
@@ -39,9 +40,9 @@ public abstract class AbstractComponentSource implements ComponentSource {
             final Class<?> clazz = Class.forName(definition.getName(), true, this.getClass().getClassLoader());
             return ReflectionUtils.createInstance(clazz);
         } catch (DIFrameworkInstantiationException e) {
-            throw new JavaObjectSourceProcessorException("Can't create instance of the class: " + definition.getName());
+            throw new JavaObjectSourceInstanceCreationException("Can't create instance of the class: " + definition.getName());
         } catch (ClassNotFoundException e) {
-            throw new JavaObjectSourceProcessorException("Can't find class: " + definition.getName());
+            throw new JavaObjectSourceInstanceCreationException("Can't find class: " + definition.getName());
         }
     }
 

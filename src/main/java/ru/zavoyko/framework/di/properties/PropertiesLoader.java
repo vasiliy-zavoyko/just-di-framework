@@ -13,17 +13,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.io.Resources.getResource;
 
-/**
- * The properties loader.
- */
 public class PropertiesLoader {
 
-    /**
-     * Loads the properties from the file.
-     *
-     * @param propertyName The name of the properties file.
-     * @return The map of the properties.
-     */
     public Map<String, String> loadProperties(String propertyName) {
         try (final var properties = new BufferedReader(new InputStreamReader(getResource(propertyName).openStream()))) {
             return properties.lines()

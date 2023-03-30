@@ -8,15 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ComponentFactory {
-    @SneakyThrows
-//    <T> T createComponent(Class<T> componentClass);
 
     Object createComponent(Definition definition);
 
-//    List<Class> getClassesByAliasName(String name);
-
     Set<Definition> getComponentsDefinitions();
-
-//    Definition getAndCheckDefinition(Class<?> type);
 
 }

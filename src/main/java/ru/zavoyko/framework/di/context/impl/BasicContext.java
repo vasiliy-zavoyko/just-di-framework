@@ -2,6 +2,7 @@ package ru.zavoyko.framework.di.context.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.zavoyko.framework.di.exceptions.DIFrameworkComponentBindException;
 import ru.zavoyko.framework.di.factory.ComponentFactory;
 import ru.zavoyko.framework.di.source.Definition;
 
@@ -65,7 +66,7 @@ public class BasicContext extends AbstractContext {
         if (type.isAssignableFrom(component.getClass())) {
             return component;
         }
-        throw new RuntimeException("No implementation found for " + type.getCanonicalName());
+        throw new DIFrameworkComponentBindException("No implementation found for " + type.getCanonicalName());
     }
 
     @Override

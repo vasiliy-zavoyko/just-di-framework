@@ -11,7 +11,7 @@ import ru.zavoyko.framework.di.inject.java.TypeToInject;
 
 import javax.annotation.PostConstruct;
 
-@TypeToInject
+@TypeToInject(isLazy = true)
 public class Starter {
 
     private final static Logger logger = LoggerFactory.getLogger(Starter.class);

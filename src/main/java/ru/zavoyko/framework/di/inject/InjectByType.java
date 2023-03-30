@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 @Target({ java.lang.annotation.ElementType.FIELD })
 public @interface InjectByType {
 
-    Class<?> value() default Object.class;
+    String type() default "";
 
 }
