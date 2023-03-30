@@ -1,7 +1,6 @@
 package ru.zavoyko.framework.di.processors.actions;
 
 import ru.zavoyko.framework.di.context.Context;
-import ru.zavoyko.framework.di.context.impl.BasicContext;
 
 public interface ActionsProcessor {
 
