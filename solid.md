@@ -97,4 +97,18 @@ Create Component processor
 ```
 
 ### Step 6
-Add Context
+Add Component processor for injection
+
+```java
+@Override
+public void process(BasicContext context, Object component) {
+    for (var field : component.getClass().getDeclaredFields()) {
+        if (field.isAnnotationPresent(InjectByType.class)) {
+            var fieldClass = field.getType();
+            final var instance = context.getComponent(fieldClass);
+            makeAccessible(field);
+            setField(component, field, instance);
+        }
+    }
+}
+```
