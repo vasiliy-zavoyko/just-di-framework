@@ -2,16 +2,22 @@ package ru.zavoyko.framework.di.source;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import ru.zavoyko.framework.di.source.data.Logger;
+import ru.zavoyko.framework.di.source.data.Writer;
 import ru.zavoyko.framework.di.source.data.Starter;
-import ru.zavoyko.framework.di.source.data.impl.StarterRunner;
-import ru.zavoyko.framework.di.source.data.impl.TestLogger;
+import ru.zavoyko.framework.di.source.data.impl.StarterImpl;
+import ru.zavoyko.framework.di.source.data.impl.WriterImpl;
 
 @Slf4j
-public class FrameworkTest {
+class FrameworkTest {
 
-    private static final Logger LOGGER = new TestLogger();
-    private static final Starter STARTER = new StarterRunner();
+    private static final Writer LOGGER;
+    private static final Starter STARTER;
+
+    static {
+        var logger = new WriterImpl();
+        LOGGER = logger;
+        STARTER = new StarterImpl(logger);
+    }
 
     @Test
     void testEntryPoint() {

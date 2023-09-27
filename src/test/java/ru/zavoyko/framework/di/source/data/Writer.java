@@ -1,6 +1,6 @@
 package ru.zavoyko.framework.di.source.data;
 
-public interface Logger {
+public interface Writer {
 
     void log(String msg);
 
