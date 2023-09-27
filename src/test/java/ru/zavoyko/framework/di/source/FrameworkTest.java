@@ -7,16 +7,13 @@ import ru.zavoyko.framework.di.source.data.Starter;
 import ru.zavoyko.framework.di.source.data.impl.StarterImpl;
 import ru.zavoyko.framework.di.source.data.impl.WriterImpl;
 
+import static ru.zavoyko.framework.di.impl.ObjectFactoryImpl.getObjectFactory;
+
 @Slf4j
 class FrameworkTest {
 
-    private static final Writer LOGGER;
-    private static final Starter STARTER;
-
-    static {
-        LOGGER = new WriterImpl();
-        STARTER = new StarterImpl();
-    }
+    private static final Writer LOGGER = getObjectFactory().create(WriterImpl.class);
+    private static final Starter STARTER = getObjectFactory().create(StarterImpl.class);
 
     @Test
     void testEntryPoint() {
