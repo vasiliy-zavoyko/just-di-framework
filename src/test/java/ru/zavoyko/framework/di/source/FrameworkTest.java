@@ -14,9 +14,8 @@ class FrameworkTest {
     private static final Starter STARTER;
 
     static {
-        var logger = new WriterImpl();
-        LOGGER = logger;
-        STARTER = new StarterImpl(logger);
+        LOGGER = new WriterImpl();
+        STARTER = new StarterImpl();
     }
 
     @Test
