@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import ru.zavoyko.framework.di.BeanProcessor;
-import ru.zavoyko.framework.di.Config;
+import ru.zavoyko.framework.di.Context;
 import ru.zavoyko.framework.di.ObjectFactory;
+import ru.zavoyko.framework.di.exception.DIFException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,7 +24,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     private static final Lock LOCK = new ReentrantLock();
     private static ObjectFactoryImpl OBJECT_FACTORY;
 
-    public static ObjectFactoryImpl getObjectFactory(String pkg, Map<Class, Class> classClassMap) {
+    public static ObjectFactoryImpl getObjectFactory(Context context) {
         var ref = OBJECT_FACTORY;
         if (ref == null) {
             LOCK.lock();
@@ -30,7 +32,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 ref = OBJECT_FACTORY;
                 if (ref == null) {
                     log.info("Object factory created");
-                    OBJECT_FACTORY = new ObjectFactoryImpl(new ConfigImpl(pkg, classClassMap));
+                    OBJECT_FACTORY = new ObjectFactoryImpl(context);
                 }
             } finally {
                 LOCK.unlock();
@@ -39,28 +41,44 @@ public class ObjectFactoryImpl implements ObjectFactory {
         return OBJECT_FACTORY;
     }
 
-    private final Config config;
+    private final Context context;
 
     @Override
     public <T> T create(final Class<T> clazz) {
         checkNonNullOrThrowException(clazz, "Class can't be null");
-        Class<? extends T> implClass = clazz;
-        if (clazz.isInterface()) {
-            implClass = config.getImplClass(clazz);
+        log.debug("Creating instance of type: {}", clazz.getName());
+        final T newInstance;
+        try {
+            newInstance = instantiate(clazz);
+            log.debug("Instance of type {} successfully instantiated", clazz.getName());
+        } catch (DIFException e) {
+            log.error("Error instantiating object of type: {}", clazz.getName(), e);
+            throw e;
         }
-        log.info("Requested object of type: " + implClass.getName());
-        final T newInstance = instantiate(implClass);
-
-        setFields(newInstance);
-
+        try {
+            log.debug("Setting fields for instance of type: {}", clazz.getName());
+            setFields(newInstance);
+            log.debug("Fields successfully set for instance of type: {}", clazz.getName());
+        } catch (DIFException e) {
+            log.error("Error setting fields for instance of type: {}", clazz.getName(), e);
+            throw e;
+        }
+        log.info("Instance of type {} successfully created and returned", clazz.getName());
         return newInstance;
     }
 
+
     @SneakyThrows
     private void setFields(final Object newInstance) {
-        for (BeanProcessor beanProcessor : config.getBeanProcessors()) {
-            beanProcessor.process(newInstance);
+        log.debug("Setting fields for instance of class: {}", newInstance.getClass());
+        List<BeanProcessor> beanProcessors = context.getBeanProcessors();
+        log.debug("Total BeanProcessors to be applied: {}", beanProcessors.size());
+        for (BeanProcessor beanProcessor : beanProcessors) {
+            log.debug("Applying BeanProcessor: {} to instance of class: {}", beanProcessor.getClass(), newInstance.getClass());
+            beanProcessor.process(context, newInstance);
+            log.debug("BeanProcessor: {} applied successfully", beanProcessor.getClass());
         }
+        log.debug("Field setting completed for instance of class: {}", newInstance.getClass());
     }
 
 }
