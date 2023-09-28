@@ -1,27 +1,27 @@
 package ru.zavoyko.framework.di.impl;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.zavoyko.framework.di.Config;
 import ru.zavoyko.framework.di.ObjectFactory;
 import ru.zavoyko.framework.di.exception.DIFException;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static ru.zavoyko.framework.di.utils.DIFObjectUtils.checkNonNullOrThrowException;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class ObjectFactoryImpl implements ObjectFactory {
 
     private static final Lock LOCK = new ReentrantLock();
-    private static final Config CONFIG = new ConfigImpl("ru.zavoyko.framework.di");
     private static ObjectFactoryImpl OBJECT_FACTORY;
 
-    public static ObjectFactoryImpl getObjectFactory() {
+    public static ObjectFactoryImpl getObjectFactory(String pkg, Map<Class, Class> classClassMap) {
         var ref = OBJECT_FACTORY;
         if (ref == null) {
             LOCK.lock();
@@ -29,7 +29,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 ref = OBJECT_FACTORY;
                 if (ref == null) {
                     log.info("Object factory created");
-                    OBJECT_FACTORY = new ObjectFactoryImpl();
+                    OBJECT_FACTORY = new ObjectFactoryImpl(new ConfigImpl(pkg, classClassMap));
                 }
             } finally {
                 LOCK.unlock();
@@ -38,13 +38,15 @@ public class ObjectFactoryImpl implements ObjectFactory {
         return OBJECT_FACTORY;
     }
 
+    private final Config config;
+
     @Override
     public <T> T create(final Class<T> clazz) {
         checkNonNullOrThrowException(clazz, "Class can't be null");
         try {
             Class<? extends T> implClass = clazz;
             if (clazz.isInterface()) {
-                implClass = CONFIG.getImplClass(clazz);
+                implClass = config.getImplClass(clazz);
             }
             log.info("Requested object of type: " + implClass.getName());
             return implClass.getDeclaredConstructor().newInstance();

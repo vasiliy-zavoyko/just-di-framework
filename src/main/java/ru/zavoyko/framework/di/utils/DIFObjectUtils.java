@@ -18,4 +18,13 @@ public class DIFObjectUtils {
         return t;
     }
 
+    public static <T> T castToType(Object obj, Class<T> clazz) {
+        try {
+            return clazz.cast(obj);
+        } catch (ClassCastException classCastException) {
+            throw new DIFException("Can not cast " +
+                    obj.getClass() + " to " + clazz);
+        }
+    }
+
 }
