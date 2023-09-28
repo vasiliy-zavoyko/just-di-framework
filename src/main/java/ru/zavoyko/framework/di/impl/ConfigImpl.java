@@ -1,13 +1,17 @@
 package ru.zavoyko.framework.di.impl;
 
 import org.reflections.Reflections;
+import ru.zavoyko.framework.di.BeanProcessor;
 import ru.zavoyko.framework.di.Config;
 import ru.zavoyko.framework.di.exception.DIFException;
+import ru.zavoyko.framework.di.utils.DIFObjectUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
 import static ru.zavoyko.framework.di.utils.DIFObjectUtils.checkNonNullOrThrowException;
 
 public class ConfigImpl implements Config {
@@ -30,6 +34,14 @@ public class ConfigImpl implements Config {
             }
             return typesOf.iterator().next();
         });
+    }
+
+    @Override
+    public List<BeanProcessor> getBeanProcessors() {
+        var subTypesOfBeanProcessor = reflections.getSubTypesOf(BeanProcessor.class);
+        return subTypesOfBeanProcessor.stream()
+                .map(DIFObjectUtils::instantiate)
+                .collect(toList());
     }
 
 }

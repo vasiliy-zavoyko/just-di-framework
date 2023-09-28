@@ -2,14 +2,17 @@ package ru.zavoyko.framework.di.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.zavoyko.framework.di.exception.DIFException;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class DIFObjectUtils {
 
     public static <T> T checkNonNullOrThrowException(T t) {
@@ -35,6 +38,24 @@ public class DIFObjectUtils {
             return clazz.cast(obj);
         } catch (ClassCastException classCastException) {
             throw new DIFException("Can not cast " + obj.getClass() + " to " + clazz);
+        }
+    }
+
+    public static <T> T instantiate(Class<T> clazz) {
+        try {
+            return clazz.getConstructor().newInstance();
+        } catch (InstantiationException e) {
+            log.error("The class {} is not instantiable (it’s abstract or an interface)", clazz, e);
+            throw new DIFException("Can't create object for class: " + clazz, e);
+        } catch (IllegalAccessException e) {
+            log.error("The constructor of class {} is not accessible", clazz, e);
+            throw new DIFException("Can't create object for class: " + clazz, e);
+        } catch (InvocationTargetException e) {
+            log.error("The constructor of class {} threw an exception", clazz, e);
+            throw new DIFException("Can't create object for class: " + clazz, e);
+        } catch (NoSuchMethodException e) {
+            log.error("The class {} does not have a no-argument constructor", clazz, e);
+            throw new DIFException("Can't create object for class: " + clazz, e);
         }
     }
 
