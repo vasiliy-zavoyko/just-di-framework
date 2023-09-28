@@ -12,8 +12,8 @@ import static ru.zavoyko.framework.di.impl.ObjectFactoryImpl.getObjectFactory;
 @Slf4j
 class FrameworkTest {
 
-    private static final Writer LOGGER = getObjectFactory().create(WriterImpl.class);
-    private static final Starter STARTER = getObjectFactory().create(StarterImpl.class);
+    private static final Writer LOGGER = getObjectFactory().create(Writer.class);
+    private static final Starter STARTER = getObjectFactory().create(Starter.class);
 
     @Test
     void testEntryPoint() {

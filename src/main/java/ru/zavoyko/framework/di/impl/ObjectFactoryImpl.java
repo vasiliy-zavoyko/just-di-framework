@@ -3,6 +3,7 @@ package ru.zavoyko.framework.di.impl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.zavoyko.framework.di.Config;
 import ru.zavoyko.framework.di.ObjectFactory;
 import ru.zavoyko.framework.di.exception.DIFException;
 
@@ -17,6 +18,7 @@ import static ru.zavoyko.framework.di.utils.DIFObjectUtils.checkNonNullOrThrowEx
 public class ObjectFactoryImpl implements ObjectFactory {
 
     private static final Lock LOCK = new ReentrantLock();
+    private static final Config CONFIG = new ConfigImpl("ru.zavoyko.framework.di");
     private static ObjectFactoryImpl OBJECT_FACTORY;
 
     public static ObjectFactoryImpl getObjectFactory() {
@@ -40,8 +42,12 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public <T> T create(final Class<T> clazz) {
         checkNonNullOrThrowException(clazz, "Class can't be null");
         try {
-            log.info("Requested object of type: " + clazz.getName());
-            return clazz.getDeclaredConstructor().newInstance();
+            Class<? extends T> implClass = clazz;
+            if (clazz.isInterface()) {
+                implClass = CONFIG.getImplClass(clazz);
+            }
+            log.info("Requested object of type: " + implClass.getName());
+            return implClass.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             log.error("Error during instantiation of object type: " + clazz, e);
             throw new DIFException("Can't create object for class: " + clazz, e);
