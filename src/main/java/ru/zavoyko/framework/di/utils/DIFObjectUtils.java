@@ -44,6 +44,15 @@ public class DIFObjectUtils {
         }
     }
 
+    public static Class<?> loadClassByName(String fullyQualifiedName){
+        try {
+            log.debug("Loading class: " + fullyQualifiedName);
+            return Class.forName(fullyQualifiedName);
+        } catch (ClassNotFoundException e) {
+            log.error("Unable lo load class: " + fullyQualifiedName, e);
+            throw new DIFException("Unable lo load class: " + fullyQualifiedName, e);
+        }
+    }
 
     public static <T> T instantiate(Class<T> clazz) {
         log.debug("Trying to instantiate {}", clazz);

@@ -22,8 +22,8 @@ public class InjectTypeProcessor implements BeanProcessor {
             if (field.isAnnotationPresent(InjectType.class)) {
                 log.info("Found field to inject: " + field);
                 final var annotation = field.getAnnotation(InjectType.class);
-                Class<?> implClass = field.getType();
-                if (annotation.type() != Object.class) {
+                String implClass = field.getType().getCanonicalName();
+                if (!annotation.type().trim().isEmpty()) {
                     implClass = annotation.type();
                 }
                 final Object dependency = context.getBean(implClass);

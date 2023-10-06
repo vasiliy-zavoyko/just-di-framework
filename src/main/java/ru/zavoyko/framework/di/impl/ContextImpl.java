@@ -1,14 +1,14 @@
 package ru.zavoyko.framework.di.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.zavoyko.framework.di.BeanProcessor;
-import ru.zavoyko.framework.di.Config;
-import ru.zavoyko.framework.di.Context;
-import ru.zavoyko.framework.di.ObjectFactory;
+import ru.zavoyko.framework.di.*;
 import ru.zavoyko.framework.di.anotations.TypeToInject;
+import ru.zavoyko.framework.di.exception.DIFException;
+import ru.zavoyko.framework.di.utils.DIFObjectUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static ru.zavoyko.framework.di.utils.DIFObjectUtils.*;
@@ -22,7 +22,7 @@ public class ContextImpl implements Context {
 
     private Config config;
     private ObjectFactory objectFactory;
-    private Map<Class<?>, Object> singletonMap;
+    private Map<String, Object> singletonMap;
 
     private ContextImpl(Config configToSet) {
         this.config = configToSet;
@@ -34,25 +34,38 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public <T> T getBean(final Class<T> clazz) {
-        checkNonNullOrThrowException(clazz, "Type can't be null");
-        log.debug("Requesting bean of type: {}", clazz.getName());
-        Class<? extends T> implClass = clazz;
-        if (implClass.isInterface()) {
-            implClass = config.getImplClass(clazz);
-            log.debug("Implementation class for interface {}: {}", clazz.getName(), implClass.getName());
+    public Object getBean(final String clazz) {
+        {
+            log.debug("Requesting bean of type: {}", clazz);
+            if (isBlank(clazz)) {
+                throw new DIFException("Type can't be null");
+            }
+            final var singleton = checkSingleton(clazz);
+            if (singleton.isPresent()) {
+                log.debug("Returning instance of type: {}", clazz);
+                return singleton.get();
+            }
         }
-        if (singletonMap.containsKey(implClass)) {
-            log.debug("Singleton instance of type {} found in singletonMap, returning the singleton instance", implClass.getName());
-            return castToType(singletonMap.get(implClass), clazz);
+
+        final var definition = config.getDefinition(clazz);
+
+        {
+            final var singleton = checkSingleton(definition.name());
+            if (singleton.isPresent()) {
+                log.debug("Returning instance of type: {}", clazz);
+                return singleton.get();
+            }
         }
+
+        final Class<?> implClass = loadClassByName(definition.name());
         log.info("Creating new instance of type: {}", implClass.getName());
         final var res = objectFactory.create(implClass);
         if (implClass.getAnnotation(TypeToInject.class).singleton()) {
-            log.info("Type {} is a singleton, adding to singletonMap", implClass.getName());
-            singletonMap.put(implClass, res);
+            log.info("Type {} is a singleton, adding to singletonMap", definition.name());
+            singletonMap.put(definition.name(), res);
         }
-        log.debug("Returning instance of type: {}", implClass.getName());
+
+        log.debug("Returning instance of type: {}", definition.name());
         return res;
     }
 
@@ -62,5 +75,12 @@ public class ContextImpl implements Context {
         return config.getBeanProcessors();
     }
 
-}
+    private Optional<Object> checkSingleton(String name) {
+        if (singletonMap.containsKey(name)) {
+            log.info("Singleton " + name + " found");
+            return Optional.of(singletonMap.get(name));
+        }
+        return Optional.empty();
+    }
 
+}

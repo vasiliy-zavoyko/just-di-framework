@@ -9,7 +9,7 @@ public class Executor {
 
     @InjectType
     private Starter starter;
-    @InjectType(type = WriterImpl.class)
+    @InjectType(type ="ru.zavoyko.framework.di.source.data.WriterImpl")
     private Writer writer;
 
     public void run(String str) {

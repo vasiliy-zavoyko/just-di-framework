@@ -10,6 +10,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 public @interface InjectType {
 
-    Class<?> type() default Object.class;
+    String type() default "";
 
 }

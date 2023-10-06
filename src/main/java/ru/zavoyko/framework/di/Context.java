@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Context {
 
-    <T> T getBean(Class<T> clazz);
+    Object getBean(String clazz);
 
     List<BeanProcessor> getBeanProcessors();
 

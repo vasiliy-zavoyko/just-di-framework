@@ -15,7 +15,7 @@ public class StarterImpl implements Starter {
     private String prop;
     @InjectProperty
     private String property;
-    @InjectType(type = WriterImpl.class)
+    @InjectType(type = "ru.zavoyko.framework.di.source.data.WriterImpl")
     private Writer writer;
     @InjectType
     private DeadWriterImpl deadWriter;
