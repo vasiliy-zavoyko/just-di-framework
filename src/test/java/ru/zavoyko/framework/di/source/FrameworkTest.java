@@ -2,26 +2,25 @@ package ru.zavoyko.framework.di.source;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import ru.zavoyko.framework.di.Context;
+import ru.zavoyko.framework.di.DIFramework;
+import ru.zavoyko.framework.di.ObjectFactory;
+import ru.zavoyko.framework.di.impl.ObjectFactoryImpl;
+import ru.zavoyko.framework.di.source.data.Executor;
 import ru.zavoyko.framework.di.source.data.Writer;
 import ru.zavoyko.framework.di.source.data.Starter;
 import ru.zavoyko.framework.di.source.data.impl.StarterImpl;
-import ru.zavoyko.framework.di.source.data.impl.WriterImpl;
+
+import java.util.Map;
 
 @Slf4j
 class FrameworkTest {
 
-    private static final Writer LOGGER;
-    private static final Starter STARTER;
-
-    static {
-        LOGGER = new WriterImpl();
-        STARTER = new StarterImpl();
-    }
-
     @Test
     void testEntryPoint() {
-        LOGGER.log("Test msg");
-        STARTER.start();
+        final var framework = DIFramework.getDIFramework("ru.zavoyko.framework.di");
+        final var executor = framework.getBean(Executor.class);
+        executor.exec();
     }
 
 }
