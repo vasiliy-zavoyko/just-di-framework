@@ -4,11 +4,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import ru.zavoyko.framework.di.BeanProcessor;
-import ru.zavoyko.framework.di.Config;
-import ru.zavoyko.framework.di.ObjectFactory;
+import ru.zavoyko.framework.di.*;
+import ru.zavoyko.framework.di.anotations.Autowired;
+import ru.zavoyko.framework.di.utils.DIFObjectUtils;
 
+import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,7 +24,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     private static final Lock LOCK = new ReentrantLock();
     private static ObjectFactoryImpl OBJECT_FACTORY;
 
-    public static ObjectFactoryImpl getObjectFactory(String pkg, Map<Class, Class> classClassMap) {
+    public static ObjectFactoryImpl getObjectFactory(final Config config, final Context context) {
         var ref = OBJECT_FACTORY;
         if (ref == null) {
             LOCK.lock();
@@ -30,7 +32,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
                 ref = OBJECT_FACTORY;
                 if (ref == null) {
                     log.info("Object factory created");
-                    OBJECT_FACTORY = new ObjectFactoryImpl(new ConfigImpl(pkg, classClassMap));
+                    OBJECT_FACTORY = new ObjectFactoryImpl(config, context);
                 }
             } finally {
                 LOCK.unlock();
@@ -40,6 +42,7 @@ public class ObjectFactoryImpl implements ObjectFactory {
     }
 
     private final Config config;
+    private final Context context;
 
     @Override
     public <T> T create(final Class<T> clazz) {
@@ -52,14 +55,23 @@ public class ObjectFactoryImpl implements ObjectFactory {
         final T newInstance = instantiate(implClass);
 
         setFields(newInstance);
+        final var proxy = setActions(newInstance);
 
-        return newInstance;
+        return clazz.cast(proxy);
+    }
+
+    private Object setActions(final Object newInstance) {
+        Object proxy = newInstance;
+        for (final var actionProcessor : config.getActionProcessors()) {
+            proxy = actionProcessor.process(context, proxy);
+        }
+        return proxy;
     }
 
     @SneakyThrows
     private void setFields(final Object newInstance) {
         for (BeanProcessor beanProcessor : config.getBeanProcessors()) {
-            beanProcessor.process(newInstance);
+            beanProcessor.process(context, newInstance);
         }
     }
 

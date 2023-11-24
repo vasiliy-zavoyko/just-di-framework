@@ -2,6 +2,6 @@ package ru.zavoyko.framework.di;
 
 public interface BeanProcessor {
 
-    void process(Object object);
+    void process(Context context,Object object);
 
 }

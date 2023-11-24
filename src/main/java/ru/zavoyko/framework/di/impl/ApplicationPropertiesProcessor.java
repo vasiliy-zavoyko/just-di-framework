@@ -2,7 +2,9 @@ package ru.zavoyko.framework.di.impl;
 
 import lombok.SneakyThrows;
 import ru.zavoyko.framework.di.BeanProcessor;
+import ru.zavoyko.framework.di.Context;
 import ru.zavoyko.framework.di.anotations.InjectProperty;
+import ru.zavoyko.framework.di.utils.DIFObjectUtils;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -20,7 +22,7 @@ public class ApplicationPropertiesProcessor implements BeanProcessor {
     }
     @Override
     @SneakyThrows
-    public void process(Object instance) {
+    public void process(Context context, Object instance) {
         final Class<?> newInstanceClass = instance.getClass();
         final var declaredFields = getDeclaredFields(newInstanceClass);
         for (Field field : declaredFields) {

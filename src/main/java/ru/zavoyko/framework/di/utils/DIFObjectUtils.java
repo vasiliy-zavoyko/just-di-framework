@@ -7,6 +7,7 @@ import ru.zavoyko.framework.di.exception.DIFException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,6 +71,19 @@ public class DIFObjectUtils {
         Class<?> superclass = clazz.getSuperclass();
         if (superclass != null && superclass != Object.class) {
             getDeclaredFields(superclass, fields);
+        }
+    }
+
+    public static Set<Method> getDeclaredMethods(Class<?> clazz) {
+        final var methods = new HashSet<Method>();
+        getDeclared(clazz, methods);
+        return methods;
+    }
+
+    private static void getDeclared(Class<?> clazz, HashSet<Method> methods) {
+        Collections.addAll(methods, clazz.getDeclaredMethods());
+        if (clazz.getSuperclass() != Object.class && clazz.getSuperclass() != null) {
+            getDeclared(clazz.getSuperclass(), methods);
         }
     }
 
