@@ -1,10 +1,12 @@
-package ru.zavoyko.framework.di;
+package ru.zavoyko.framework.di.factory.impl;
+
+import static ru.zavoyko.framework.di.Util.createInstance;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
-
-import static com.google.common.io.Resources.getResource;
+import ru.zavoyko.framework.di.context.Context;
+import ru.zavoyko.framework.di.factory.ObjectFactory;
 
 @RequiredArgsConstructor
 public class ObjectFactoryImpl implements ObjectFactory {
@@ -17,11 +19,10 @@ public class ObjectFactoryImpl implements ObjectFactory {
     public <T> T getComponent(final Class<? extends T> implClass) {
         T bean;
 
-        bean = implClass.getDeclaredConstructor().newInstance();
+        bean = createInstance(implClass);
 
-//        if (!implClass.isInstance(Processor.class)) {
-            context.getAllProcessor().forEach(processor -> processor.process(bean, context));
-//        }
+        context.getAllProcessor().forEach(processor -> processor.process(bean, context));
+
         return bean;
     }
 

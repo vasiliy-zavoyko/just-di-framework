@@ -1,12 +1,13 @@
-package ru.zavoyko.framework.di.source;
+    package ru.zavoyko.framework.di.source;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import ru.zavoyko.framework.di.Configuration;
-import ru.zavoyko.framework.di.Context;
-import ru.zavoyko.framework.di.ContextImpl;
-import ru.zavoyko.framework.di.ObjectFactory;
-import ru.zavoyko.framework.di.ObjectFactoryImpl;
+
+import ru.zavoyko.framework.di.configuration.Configuration;
+import ru.zavoyko.framework.di.context.Context;
+import ru.zavoyko.framework.di.context.impl.ContextImpl;
+import ru.zavoyko.framework.di.factory.ObjectFactory;
+import ru.zavoyko.framework.di.factory.impl.ObjectFactoryImpl;
 import ru.zavoyko.framework.di.source.data.Starter;
 import ru.zavoyko.framework.di.source.data.Writer;
 import ru.zavoyko.framework.di.source.data.impl.BadStarterImpl;

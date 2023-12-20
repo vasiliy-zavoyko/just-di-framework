@@ -1,7 +1,7 @@
 package ru.zavoyko.framework.di.processor.impl;
 
 import lombok.SneakyThrows;
-import ru.zavoyko.framework.di.Context;
+import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.processor.Processor;
 
 import java.util.stream.Collectors;

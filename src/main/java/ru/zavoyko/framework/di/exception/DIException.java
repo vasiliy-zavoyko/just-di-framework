@@ -1,4 +1,4 @@
-package ru.zavoyko.framework.di;
+package ru.zavoyko.framework.di.exception;
 
 public class DIException extends RuntimeException {
 

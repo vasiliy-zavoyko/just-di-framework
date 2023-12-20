@@ -1,4 +1,4 @@
-package ru.zavoyko.framework.di;
+package ru.zavoyko.framework.di.factory;
 
 public interface ObjectFactory {
 

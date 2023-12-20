@@ -1,9 +1,13 @@
-package ru.zavoyko.framework.di;
+package ru.zavoyko.framework.di.configuration;
 
 import org.reflections.Reflections;
+
+import ru.zavoyko.framework.di.Util;
+import ru.zavoyko.framework.di.annotations.TypeToInject;
 import ru.zavoyko.framework.di.processor.Processor;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.reflect.Modifier.isAbstract;
@@ -15,6 +19,9 @@ public interface Configuration {
     }
 
     Reflections getReflection();
+
+    Set<Class<?>> getComponentClasses();
+    
     Collection<Processor> getProcessors();
 
     class ConfigurationImpl implements Configuration{
@@ -28,6 +35,11 @@ public interface Configuration {
         @Override
         public Reflections getReflection() {
             return reflection;
+        }
+
+        @Override
+        public Set<Class<?>> getComponentClasses() {
+            return reflection.getTypesAnnotatedWith(TypeToInject.class);
         }
 
         @Override
