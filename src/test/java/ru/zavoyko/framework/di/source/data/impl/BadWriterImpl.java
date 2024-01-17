@@ -6,7 +6,7 @@ import ru.zavoyko.framework.di.annotations.Value;
 import ru.zavoyko.framework.di.source.data.Writer;
 
 @Slf4j
-@TypeToInject
+@TypeToInject(isSingleton = true)
 public class BadWriterImpl implements Writer {
 
     @Value(keyToFind = "kool")

@@ -1,7 +1,6 @@
 package ru.zavoyko.framework.di.configuration;
 
 import org.reflections.Reflections;
-
 import ru.zavoyko.framework.di.Util;
 import ru.zavoyko.framework.di.annotations.TypeToInject;
 import ru.zavoyko.framework.di.processor.Processor;
@@ -21,10 +20,10 @@ public interface Configuration {
     Reflections getReflection();
 
     Set<Class<?>> getComponentClasses();
-    
+
     Collection<Processor> getProcessors();
 
-    class ConfigurationImpl implements Configuration{
+    class ConfigurationImpl implements Configuration {
 
         private Reflections reflection;
 
@@ -50,6 +49,7 @@ public interface Configuration {
                     .map(Util::createInstance)
                     .collect(Collectors.toList());
         }
+
     }
 
 }

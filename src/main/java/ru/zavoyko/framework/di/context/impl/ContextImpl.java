@@ -3,6 +3,7 @@ package ru.zavoyko.framework.di.context.impl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import ru.zavoyko.framework.di.annotations.TypeToInject;
 import ru.zavoyko.framework.di.configuration.Configuration;
 import ru.zavoyko.framework.di.context.Context;
@@ -15,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,15 +23,16 @@ import java.util.stream.Collectors;
 
 import static com.google.common.io.Resources.getResource;
 import static java.lang.reflect.Modifier.isAbstract;
-import static ru.zavoyko.framework.di.configuration.Configuration.getConfiguration;
+
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class ContextImpl implements Context {
 
     @SneakyThrows
     public static Context createContext(List<String> packagesToScan) {
         final var configurationList = packagesToScan.stream()
-                .map(pack -> getConfiguration(pack))
+                .map(Configuration::getConfiguration)
                 .toList();
 
         var propertiesMap = new BufferedReader(new InputStreamReader(getResource("application.properties").openStream()))
@@ -51,44 +52,43 @@ public class ContextImpl implements Context {
         context.setPropertyMap(propertiesMap);
         context.setConfigurations(configurationList);
         context.setImplementations(componentList);
+        log.info("calling init");
         context.init();
         return context;
     }
 
-   
-
-    private final Map<Class,Object> singletonMap = new ConcurrentHashMap<>();
+    private final Map<Class, Object> singletonMap = new ConcurrentHashMap<>();
     private final List<Configuration> configurations = new CopyOnWriteArrayList<>();
     private final Map<String, String> propertyMap = new ConcurrentHashMap<>();
     private final List<Processor> processorList = new CopyOnWriteArrayList<>();
+    private final List<Class<?>> implementations = new CopyOnWriteArrayList<>();
     private final ObjectFactory objectFactory;
-    private final List<Class<?>> implementations = new CopyOnWriteArrayList<>(); 
 
     public void init() {
         implementations.stream()
-            .filter(type -> {
-                if(type.isAnnotationPresent(TypeToInject.class)) {
-                    return type.getAnnotation(TypeToInject.class).isSingleton();
-                }
-                return false;
-            })
-            .forEach(singleton -> {
-                Optional<?> bean = getBean(singleton);
-                if (bean.isPresent() && !singletonMap.containsKey(singleton)) {
-                    System.out.println("single yeaaaah");
-                    singletonMap.put(singleton, bean);     
-                }
-            });
+                .filter(type -> {
+                    if (type.isAnnotationPresent(TypeToInject.class)) {
+                        return type.getAnnotation(TypeToInject.class).isSingleton();
+                    }
+                    return false;
+                })
+                .forEach(singleton -> {
+                    var bean = getBean(singleton);
+                    if (!singletonMap.containsKey(singleton)) {
+                        singletonMap.put(singleton, bean);
+                    }
+                });
     }
 
-    public void setConfigurations(List<Configuration> configurationList){
+    public void setConfigurations(List<Configuration> configurationList) {
         this.configurations.addAll(configurationList);
     }
+
     public void setProcessors(List<Configuration> configurationList) {
         configurationList.forEach(configuration -> processorList.addAll(configuration.getProcessors()));
     }
 
-    public void setPropertyMap(Map<String,String> propertiesMap){
+    public void setPropertyMap(Map<String, String> propertiesMap) {
         this.propertyMap.putAll(propertiesMap);
     }
 
@@ -97,17 +97,16 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public <T> Optional<T> getBean(final Class<T> beanClassToGet) { //TODO: make thread safe
+    public <T> T getBean(final Class<T> beanClassToGet) { //TODO: make thread safe
         Class<?> classToGet = beanClassToGet;
-        if (beanClassToGet.isInterface()){
-           classToGet = getImplementation(beanClassToGet);
+        if (beanClassToGet.isInterface()) {
+            classToGet = getImplementation(beanClassToGet);
         }
-        if(singletonMap.containsKey(classToGet)){
-            return Optional.of(beanClassToGet.cast(singletonMap.get(classToGet)));
+        if (singletonMap.containsKey(classToGet)) {
+            return beanClassToGet.cast(singletonMap.get(classToGet));
         }
         final var newImpl = objectFactory.getComponent(classToGet);
-        singletonMap.put(classToGet, newImpl);
-        return Optional.of(beanClassToGet.cast(newImpl));
+        return beanClassToGet.cast(newImpl);
     }
 
     @Override
@@ -125,7 +124,7 @@ public class ContextImpl implements Context {
         if (!clazz.isInterface() && !isAbstract(clazz.getModifiers())) {
             return clazz;
         }
-        
+
         var classList = implementations.stream()
                 .filter(impl -> impl.isInstance(clazz))
                 .map(impl -> {

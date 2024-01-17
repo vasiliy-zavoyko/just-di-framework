@@ -16,10 +16,13 @@ public class StarterImpl implements Starter {
 
     @InjectByType(classValue = WriterImpl.class)
     private Writer writer;
+    @InjectByType(classValue = BadWriterImpl.class)
+    private Writer badWriter;
 
     @Override
     public void start() {
         log.info("Started...");
+        badWriter.log("i'm baddddd");
         writer.log(nameToFind);
     }
 

@@ -17,17 +17,17 @@ public class JokeProcessorImpl implements Processor {
                 .filter(field -> field.getType() == String.class).filter(field -> {
                     field.setAccessible(true);
                     try {
-                        final var name =  ((String) field.get(object));
+                        final var name = ((String) field.get(object));
                         return ((name != null) && !name.isEmpty());
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
                 }).collect(Collectors.toSet());
 
-        for (final var col: collect) {
+        for (final var col : collect) {
             col.setAccessible(true);
             final var string = (String) col.get(object);
-            col.set(object,string.toUpperCase());
+            col.set(object, string.toUpperCase());
         }
     }
 

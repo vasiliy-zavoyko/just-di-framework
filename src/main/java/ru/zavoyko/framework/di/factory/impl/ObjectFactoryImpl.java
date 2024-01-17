@@ -1,12 +1,12 @@
 package ru.zavoyko.framework.di.factory.impl;
 
-import static ru.zavoyko.framework.di.Util.createInstance;
-
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.factory.ObjectFactory;
+
+import static ru.zavoyko.framework.di.Util.createInstance;
 
 @RequiredArgsConstructor
 public class ObjectFactoryImpl implements ObjectFactory {

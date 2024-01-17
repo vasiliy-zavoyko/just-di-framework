@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface Context {
 
-   <T> Optional<T> getBean(Class<T> tClass);
+   <T> T getBean(Class<T> tClass);
 
    String getProperty(String key);
 
