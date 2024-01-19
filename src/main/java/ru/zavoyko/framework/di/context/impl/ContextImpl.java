@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import ru.zavoyko.framework.di.Util;
 import ru.zavoyko.framework.di.annotations.TypeToInject;
 import ru.zavoyko.framework.di.configuration.Configuration;
 import ru.zavoyko.framework.di.context.Context;
@@ -12,8 +13,10 @@ import ru.zavoyko.framework.di.factory.ObjectFactory;
 import ru.zavoyko.framework.di.factory.impl.ObjectFactoryImpl;
 import ru.zavoyko.framework.di.processor.Processor;
 
+import javax.annotation.PreDestroy;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,12 +75,7 @@ public class ContextImpl implements Context {
                     }
                     return false;
                 })
-                .forEach(singleton -> {
-                    var bean = getBean(singleton);
-                    if (!singletonMap.containsKey(singleton)) {
-                        singletonMap.put(singleton, bean);
-                    }
-                });
+                .forEach(this::getBean);
     }
 
     public void setConfigurations(List<Configuration> configurationList) {
@@ -106,7 +104,12 @@ public class ContextImpl implements Context {
             return beanClassToGet.cast(singletonMap.get(classToGet));
         }
         final var newImpl = objectFactory.getComponent(classToGet);
-        return beanClassToGet.cast(newImpl);
+
+        final var result = beanClassToGet.cast(newImpl);
+        if (beanClassToGet.isAnnotationPresent(TypeToInject.class) && beanClassToGet.getAnnotation(TypeToInject.class).isSingleton()) {
+            singletonMap.put(classToGet, result);
+        }
+        return result;
     }
 
     @Override
@@ -137,6 +140,28 @@ public class ContextImpl implements Context {
         }
 
         return classList.get(0);
+    }
+
+    @Override
+    public void close() {
+        log.info("im out this  *****!!!");
+
+        singletonMap.values()
+                .forEach(object -> {
+                    Util.getMethods(object)
+                            .stream()
+                            .filter(method -> method.isAnnotationPresent(PreDestroy.class))
+                            .findFirst()
+                            .ifPresent(method -> {
+                                try {
+                                    method.invoke(object, null);
+                                } catch (IllegalAccessException e) {
+                                    throw new RuntimeException(e);
+                                } catch (InvocationTargetException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                });
     }
 
 }

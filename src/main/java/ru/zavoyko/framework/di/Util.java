@@ -5,6 +5,7 @@ import ru.zavoyko.framework.di.exception.DIException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +26,18 @@ public class Util {
         }
 
         return fields;
+    }
+
+    public static Set<Method> getMethods(Object object) {
+        final var methods = new HashSet<Method>();
+        Class<?> objectClass = object.getClass();
+
+        while (objectClass != null && objectClass != Object.class) {
+            Collections.addAll(methods, objectClass.getMethods());
+            objectClass = objectClass.getSuperclass();
+        }
+
+        return methods;
     }
 
     public static <T> T createInstance(Class<T> tClass) {

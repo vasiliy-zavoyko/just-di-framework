@@ -2,17 +2,17 @@ package ru.zavoyko.framework.di.context;
 
 import ru.zavoyko.framework.di.processor.Processor;
 
+import java.io.Closeable;
 import java.util.List;
-import java.util.Optional;
 
-public interface Context {
+public interface Context extends Closeable {
 
-   <T> T getBean(Class<T> tClass);
+    <T> T getBean(Class<T> tClass);
 
-   String getProperty(String key);
+    String getProperty(String key);
 
-   List<? extends Processor> getAllProcessor();
+    List<? extends Processor> getAllProcessor();
 
-   <T> Class<? extends T> getImplementation(Class<T> clazz);
+    <T> Class<? extends T> getImplementation(Class<T> clazz);
 
 }
