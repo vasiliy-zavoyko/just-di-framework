@@ -2,79 +2,44 @@ package ru.zavoyko.framework.di.context.impl;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import ru.zavoyko.framework.di.Util;
 import ru.zavoyko.framework.di.annotations.TypeToInject;
 import ru.zavoyko.framework.di.configuration.Configuration;
 import ru.zavoyko.framework.di.context.Context;
 import ru.zavoyko.framework.di.exception.DIException;
 import ru.zavoyko.framework.di.factory.ObjectFactory;
-import ru.zavoyko.framework.di.factory.impl.ObjectFactoryImpl;
 import ru.zavoyko.framework.di.processor.Processor;
 
 import javax.annotation.PreDestroy;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
-import static com.google.common.io.Resources.getResource;
 import static java.lang.reflect.Modifier.isAbstract;
+import static ru.zavoyko.framework.di.Util.castAndReturn;
+import static ru.zavoyko.framework.di.Util.getMethods;
 
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 @Slf4j
 public class ContextImpl implements Context {
-
-    @SneakyThrows
-    public static Context createContext(List<String> packagesToScan) {
-        final var configurationList = packagesToScan.stream()
-                .map(Configuration::getConfiguration)
-                .toList();
-
-        var propertiesMap = new BufferedReader(new InputStreamReader(getResource("application.properties").openStream()))
-                .lines()
-                .map(String::trim)
-                .map(str -> str.split("="))
-                .collect(Collectors.toMap(pair -> pair[0].trim(), pair -> pair[1].trim()));
-
-        var componentList = configurationList.stream().map(Configuration::getComponentClasses)
-                .flatMap(Set::stream)
-                .toList();
-
-        final var factory = new ObjectFactoryImpl();
-        final var context = new ContextImpl(factory);
-        factory.setContext(context);
-        context.setProcessors(configurationList);
-        context.setPropertyMap(propertiesMap);
-        context.setConfigurations(configurationList);
-        context.setImplementations(componentList);
-        log.info("calling init");
-        context.init();
-        return context;
-    }
 
     private final Map<Class, Object> singletonMap = new ConcurrentHashMap<>();
     private final List<Configuration> configurations = new CopyOnWriteArrayList<>();
     private final Map<String, String> propertyMap = new ConcurrentHashMap<>();
     private final List<Processor> processorList = new CopyOnWriteArrayList<>();
-    private final List<Class<?>> implementations = new CopyOnWriteArrayList<>();
+
     private final ObjectFactory objectFactory;
 
     public void init() {
-        implementations.stream()
-                .filter(type -> {
-                    if (type.isAnnotationPresent(TypeToInject.class)) {
-                        return type.getAnnotation(TypeToInject.class).isSingleton();
-                    }
-                    return false;
-                })
+        log.debug("Initiating context");
+        configurations.stream()
+                .map(Configuration::getComponentClasses)
+                .flatMap(Set::stream)
+                .filter(type -> type.isAnnotationPresent(TypeToInject.class) && type.getAnnotation(TypeToInject.class).isSingleton())
                 .forEach(this::getBean);
     }
 
@@ -90,26 +55,18 @@ public class ContextImpl implements Context {
         this.propertyMap.putAll(propertiesMap);
     }
 
-    public void setImplementations(List<Class<?>> classes) {
-        implementations.addAll(classes);
-    }
-
     @Override
-    public <T> T getBean(final Class<T> beanClassToGet) { //TODO: make thread safe
-        Class<?> classToGet = beanClassToGet;
-        if (beanClassToGet.isInterface()) {
-            classToGet = getImplementation(beanClassToGet);
-        }
-        if (singletonMap.containsKey(classToGet)) {
-            return beanClassToGet.cast(singletonMap.get(classToGet));
-        }
-        final var newImpl = objectFactory.getComponent(classToGet);
+    public <T> T getBean(final Class<T> beanClassToGet) {
+        log.debug("Getting bean of class {}", beanClassToGet.getName());
+        final Class<?> classToGet = beanClassToGet.isInterface() ? getImplementation(beanClassToGet) : beanClassToGet;
 
-        final var result = beanClassToGet.cast(newImpl);
-        if (beanClassToGet.isAnnotationPresent(TypeToInject.class) && beanClassToGet.getAnnotation(TypeToInject.class).isSingleton()) {
-            singletonMap.put(classToGet, result);
+        if (singletonMap.containsKey(classToGet)) {
+            return castAndReturn(beanClassToGet, singletonMap.get(classToGet));
+        } else if (beanClassToGet.isAnnotationPresent(TypeToInject.class) && !beanClassToGet.getAnnotation(TypeToInject.class).isSingleton()) {
+            return castAndReturn(beanClassToGet, objectFactory.getComponent(classToGet));
         }
-        return result;
+
+        return castAndReturn(beanClassToGet, singletonMap.computeIfAbsent(classToGet, objectFactory::getComponent));
     }
 
     @Override
@@ -128,40 +85,43 @@ public class ContextImpl implements Context {
             return clazz;
         }
 
-        var classList = implementations.stream()
-                .filter(impl -> impl.isInstance(clazz))
-                .map(impl -> {
-                    return (Class<? extends T>) impl;
-                })
+        final var classList = configurations.stream()
+                .map(Configuration::getComponentClasses)
+                .flatMap(Set::stream)
+                .filter(clazz::isAssignableFrom)
                 .toList();
 
         if (classList.size() != 1) {
             throw new DIException("0 or more than one implementations found", new IllegalArgumentException(clazz.getName()));
         }
 
-        return classList.get(0);
+        Class<?> implClass = classList.get(0);
+
+        if (!clazz.isAssignableFrom(implClass)) {
+            throw new DIException("Found implementation does not match the required type", new IllegalArgumentException(clazz.getName()));
+        }
+
+        @SuppressWarnings("unchecked")
+        Class<? extends T> castedClass = (Class<? extends T>) implClass;
+        return castedClass;
     }
 
     @Override
     public void close() {
-        log.info("im out this  *****!!!");
-
+        log.debug("Calling preDestroy");
         singletonMap.values()
-                .forEach(object -> {
-                    Util.getMethods(object)
-                            .stream()
-                            .filter(method -> method.isAnnotationPresent(PreDestroy.class))
-                            .findFirst()
-                            .ifPresent(method -> {
-                                try {
-                                    method.invoke(object, null);
-                                } catch (IllegalAccessException e) {
-                                    throw new RuntimeException(e);
-                                } catch (InvocationTargetException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
-                });
+                .forEach(object ->
+                        getMethods(object)
+                                .stream()
+                                .filter(method -> method.isAnnotationPresent(PreDestroy.class))
+                                .forEach(method -> {
+                                    try {
+                                        method.invoke(object);
+                                    } catch (IllegalAccessException | InvocationTargetException e) {
+                                        log.error("Error during preDestroy: ", e);
+                                    }
+                                })
+        );
     }
 
 }

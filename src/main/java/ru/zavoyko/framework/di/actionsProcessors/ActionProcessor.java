@@ -1,4 +1,4 @@
-package ru.zavoyko.framework.di.processor;
+package ru.zavoyko.framework.di.actionsProcessors;
 
 import ru.zavoyko.framework.di.context.Context;
 

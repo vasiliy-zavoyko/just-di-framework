@@ -1,7 +1,7 @@
-package ru.zavoyko.framework.di.processor.actionimpl;
+package ru.zavoyko.framework.di.actionsProcessors.impl;
 
 import ru.zavoyko.framework.di.context.Context;
-import ru.zavoyko.framework.di.processor.ActionProcessor;
+import ru.zavoyko.framework.di.actionsProcessors.ActionProcessor;
 
 public class TimeToRunActionProcessorImpl implements ActionProcessor {
 

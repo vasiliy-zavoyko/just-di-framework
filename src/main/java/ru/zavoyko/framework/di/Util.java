@@ -53,4 +53,8 @@ public class Util {
         }
     }
 
+    public static <T> T castAndReturn(Class<T> clazz, Object object) {
+        return clazz.cast(object);
+    }
+
 }
