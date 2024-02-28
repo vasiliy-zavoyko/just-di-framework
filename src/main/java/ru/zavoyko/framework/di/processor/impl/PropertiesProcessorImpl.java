@@ -12,7 +12,7 @@ public class PropertiesProcessorImpl implements Processor {
     @SneakyThrows
     public void process(final Object object, Context context) {
         for (final var field : object.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Value.class) ) {
+            if (field.isAnnotationPresent(Value.class)) {
                 var value = field.getAnnotation(Value.class).keyToFind();
                 if (value.isEmpty()) {
                     value = field.getName();
@@ -23,7 +23,7 @@ public class PropertiesProcessorImpl implements Processor {
                     field.setAccessible(true);
                     field.set(object, valueToSet);
                 } else {
-                    throw new DIException(String.format("No key found, key = %s",value));
+                    throw new DIException(String.format("No key found, key = %s", value));
                 }
             }
         }

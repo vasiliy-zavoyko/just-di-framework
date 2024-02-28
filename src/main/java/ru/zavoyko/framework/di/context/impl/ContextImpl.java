@@ -3,6 +3,7 @@ package ru.zavoyko.framework.di.context.impl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.zavoyko.framework.di.actionsProcessors.ActionProcessor;
 import ru.zavoyko.framework.di.annotations.TypeToInject;
 import ru.zavoyko.framework.di.configuration.Configuration;
 import ru.zavoyko.framework.di.context.Context;
@@ -31,12 +32,18 @@ public class ContextImpl implements Context {
     private final List<Configuration> configurations = new CopyOnWriteArrayList<>();
     private final Map<String, String> propertyMap = new ConcurrentHashMap<>();
     private final List<Processor> processorList = new CopyOnWriteArrayList<>();
+    private final List<ActionProcessor> actionProcessorList = new CopyOnWriteArrayList<>();
 
     private final ObjectFactory objectFactory;
 
-    public void init() {
+    public void init(List<Configuration> configurationList) {
+        setConfigurations(configurationList);
+        setProcessors(this.configurations);
+        setPropertyMap(this.configurations);
+        setActionProcessorList(this.configurations);
+
         log.debug("Initiating context");
-        configurations.stream()
+        this.configurations.stream()
                 .map(Configuration::getComponentClasses)
                 .flatMap(Set::stream)
                 .filter(type -> type.isAnnotationPresent(TypeToInject.class) && type.getAnnotation(TypeToInject.class).isSingleton())
@@ -51,8 +58,14 @@ public class ContextImpl implements Context {
         configurationList.forEach(configuration -> processorList.addAll(configuration.getProcessors()));
     }
 
-    public void setPropertyMap(Map<String, String> propertiesMap) {
-        this.propertyMap.putAll(propertiesMap);
+    public void setActionProcessorList(List<Configuration> configurationList) {
+        configurationList.forEach(configuration -> actionProcessorList.addAll(configuration.getActionProcessors()));
+    }
+
+    public void setPropertyMap(List<Configuration> configurations) {
+        configurations.stream()
+                .map(Configuration::getPropertiesMap)
+                .forEach(propertyMap::putAll);
     }
 
     @Override
@@ -77,6 +90,11 @@ public class ContextImpl implements Context {
     @Override
     public List<? extends Processor> getAllProcessor() {
         return processorList;
+    }
+
+    @Override
+    public List<? extends ActionProcessor> getAllActionProcessors() {
+        return actionProcessorList;
     }
 
     @Override
@@ -121,7 +139,7 @@ public class ContextImpl implements Context {
                                         log.error("Error during preDestroy: ", e);
                                     }
                                 })
-        );
+                );
     }
 
 }

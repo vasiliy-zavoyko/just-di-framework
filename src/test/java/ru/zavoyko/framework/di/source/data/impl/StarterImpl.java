@@ -2,6 +2,7 @@ package ru.zavoyko.framework.di.source.data.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.zavoyko.framework.di.annotations.InjectByType;
+import ru.zavoyko.framework.di.annotations.TimeToRun;
 import ru.zavoyko.framework.di.annotations.TypeToInject;
 import ru.zavoyko.framework.di.annotations.Value;
 import ru.zavoyko.framework.di.source.data.Starter;
@@ -33,6 +34,7 @@ public class StarterImpl implements Starter {
     }
 
     @Override
+    @TimeToRun
     public void start() {
         log.info(initString);
         log.info("Started...");

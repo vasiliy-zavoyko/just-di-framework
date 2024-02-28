@@ -5,20 +5,21 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
 import ru.zavoyko.framework.di.Util;
 import ru.zavoyko.framework.di.actionsProcessors.ActionProcessor;
-import ru.zavoyko.framework.di.annotations.TimeToRun;
+import ru.zavoyko.framework.di.annotations.ExceptionInterceptor;
 import ru.zavoyko.framework.di.context.Context;
+import ru.zavoyko.framework.di.exception.DIException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class TimeToRunActionProcessorImpl implements ActionProcessor {
-
+public class ExceptionInterceptorImpl implements ActionProcessor {
     @Override
     public Object process(Object object, Context context) {
         final var collect = Util.getMethods(object).stream()
-                .filter(method -> method.isAnnotationPresent(TimeToRun.class))
+                .filter(method -> method.isAnnotationPresent(ExceptionInterceptor.class))
                 .collect(Collectors.toSet());
 
         if (collect.isEmpty()) {
@@ -31,11 +32,16 @@ public class TimeToRunActionProcessorImpl implements ActionProcessor {
     private Object getProxy(Set<Method> methods, Object object) {
         InvocationHandler invocationHandler = (proxy, method, args) -> {
             if (methods.contains(method)) {
-                log.info("Method {} was invoked", method.getName());
-                long beforeTime = System.nanoTime();
-                Object result = method.invoke(object, args);  // invoking on the original object
-                long afterTime = System.nanoTime();
-                log.info("Method {} was executed for {} nanoseconds", method.getName(), (afterTime - beforeTime) / 1000);
+                Object result;
+                try {
+                    result = method.invoke(object, args);  // invoking on the original object
+                } catch (InvocationTargetException e) {
+                    log.error("Exception was thrown during method " + method.getName() + " execution", e);
+                    if (e.getCause() instanceof DIException) {
+                        throw e;
+                    }
+                    throw new DIException("Exception was thrown during method " + method.getName() + " execution", e);
+                }
                 return result;
             } else {
                 return method.invoke(object, args);  // handle non-annotated methods
